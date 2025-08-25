@@ -1,183 +1,217 @@
-# app.py
-import io
-import re
 import streamlit as st
-import matplotlib.pyplot as plt
 from PyPDF2 import PdfReader
+import plotly.express as px
+import pandas as pd
 
-st.set_page_config(page_title="Climate Finance Indicator Tool", layout="wide")
+# ---------------- Page Config ----------------
+st.set_page_config(
+    page_title="🌍 Climate Finance Tool",
+    page_icon="🌍",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
-# ---------------------------
-# Helpers
-# ---------------------------
-def parse_number(s):
-    """Parse a string like 'KES 12 billion' or '12,000,000' -> float (absolute amount)."""
-    if s is None or s == "":
-        return None
-    s = str(s).replace(",", "").strip()
-    m = re.search(r'([+-]?\d+(?:\.\d+)?)\s*(billion|bn|million|m|thousand|k)?', s, re.I)
-    if not m:
-        return None
-    num = float(m.group(1))
-    unit = m.group(2)
-    if unit:
-        unit = unit.lower()
-        if "b" in unit:
-            num *= 1_000_000_000
-        elif "m" in unit:
-            num *= 1_000_000
-        elif unit in ("k", "thousand"):
-            num *= 1_000
-    return num
-
-def extract_text_from_pdf(uploaded_file):
-    try:
-        reader = PdfReader(uploaded_file)
-        text = []
-        for p in reader.pages:
-            txt = p.extract_text()
-            if txt:
-                text.append(txt)
-        return "\n".join(text)
-    except Exception as e:
-        st.error(f"PDF parsing failed: {e}")
-        return ""
-
-def extract_values_from_text(text):
-    """Search for numbers near key terms."""
-    patterns = {
-        "total_budget": r"(?:total national budget|total budget|national budget)[\s\S]{0,50}?([\d,\.]+\s*(?:billion|million|m|k|thousand)?)",
-        "public_investment": r"(?:public climate investment|public investment)[\s\S]{0,50}?([\d,\.]+\s*(?:billion|million|m|k|thousand)?)",
-        "adaptation_budget": r"(?:climate adaptation budget|adaptation budget)[\s\S]{0,50}?([\d,\.]+\s*(?:billion|million|m|k|thousand)?)",
-        "private_investment": r"(?:private sector investment|private investment)[\s\S]{0,50}?([\d,\.]+\s*(?:billion|million|m|k|thousand)?)"
-    }
-    extracted = {}
-    for key, pat in patterns.items():
-        m = re.search(pat, text, re.I)
-        if m:
-            extracted[key] = m.group(1)
-        else:
-            extracted[key] = ""
-    return extracted
-
-def calculate_indicators(total_budget, public_investment, adaptation_budget, private_investment):
-    """Return indicator values"""
-    total_budget = float(total_budget) if total_budget not in (None, "", 0) else None
-    public_investment = float(public_investment) if public_investment not in (None, "") else 0.0
-    adaptation_budget = float(adaptation_budget) if adaptation_budget not in (None, "") else 0.0
-    private_investment = float(private_investment) if private_investment not in (None, "") else 0.0
-
-    pct_adaptation_of_budget = (adaptation_budget / total_budget * 100) if total_budget else None
-    total_climate_investment = public_investment + private_investment
-    pct_public = (public_investment / total_climate_investment * 100) if total_climate_investment else None
-    pct_private = (private_investment / total_climate_investment * 100) if total_climate_investment else None
-
-    return {
-        "total_budget": total_budget,
-        "public_investment": public_investment,
-        "adaptation_budget": adaptation_budget,
-        "private_investment": private_investment,
-        "pct_adaptation_of_budget": pct_adaptation_of_budget,
-        "total_climate_investment": total_climate_investment,
-        "pct_public": pct_public,
-        "pct_private": pct_private
+# ---------------- Custom Theme & Styles ----------------
+st.markdown(
+    """
+    <style>
+    /* Main background */
+    .stApp {
+        background-color: #f9fafa;
+        font-family: 'Segoe UI', sans-serif;
     }
 
-# ---------------------------
-# UI
-# ---------------------------
-st.title("🌍 Climate Finance Indicator Tool")
-tab1, tab2 = st.tabs(["Upload Document", "Survey / Manual Input"])
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background-color: #1b4332;
+        color: white;
+    }
+    section[data-testid="stSidebar"] .st-radio label {
+        color: white !important;
+        font-weight: 600;
+    }
 
-# -------- Upload Document Tab --------
-with tab1:
-    st.header("Upload a budget document")
-    uploaded_file = st.file_uploader("Upload PDF (max 5MB)", type=["pdf"], key="pdf_file")
+    /* Titles */
+    h1, h2, h3 {
+        color: #1b4332;
+    }
+
+    /* Buttons */
+    div.stButton > button {
+        background-color: #2d6a4f;
+        color: white;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: 0.6em 1.2em;
+        border: none;
+    }
+    div.stButton > button:hover {
+        background-color: #40916c;
+        color: white;
+    }
+
+    /* Inputs */
+    .stTextInput input, .stTextArea textarea {
+        border-radius: 8px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ---------------- Sidebar Navigation ----------------
+st.sidebar.title("🌍 Climate Finance Tool")
+menu = st.sidebar.radio("Navigate", ["🏠 Home", "📑 Upload Document", "📝 Take Survey", "🔐 Login"])
+
+# ---------------- Helpers ----------------
+def calc_percentages(total_budget: float, public: float, adaptation: float, mitigation: float):
+    total_budget = float(total_budget or 0)
+    public = float(public or 0)
+    adaptation = float(adaptation or 0)
+    mitigation = float(mitigation or 0)
+
+    # Avoid div-by-zero
+    if total_budget <= 0:
+        return [0.0, 0.0, 0.0]
+
+    vals = [public, adaptation, mitigation]
+    return [(v / total_budget) * 100 for v in vals]
+
+def bar_percent_chart(labels, percentages, title):
+    df = pd.DataFrame({"Indicator": labels, "Percent": [round(p, 2) for p in percentages]})
+    top = max([0] + percentages)
+    max_y = 100 if top <= 100 else min(120, top + 10)  # cap a bit above top if >100
+    fig = px.bar(
+        df,
+        x="Indicator",
+        y="Percent",
+        text="Percent",
+    )
+    fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+    fig.update_layout(
+        title=title,
+        yaxis_title="Percentage of Total Budget (%)",
+        xaxis_title="",
+        template="plotly_white",
+        uniformtext_minsize=10,
+        uniformtext_mode="hide",
+        margin=dict(t=60, r=20, l=20, b=40),
+    )
+    fig.update_yaxes(range=[0, max_y])
+    return fig
+
+# ---------------- Home Page ----------------
+if menu == "🏠 Home":
+    st.title("🌍 Climate Finance Indicator Tool")
+    st.markdown(
+        """
+        Welcome to the **Climate Finance Indicator Tool**.  
+        Use this tool to:
+        - 📑 Upload and analyze budget documents (PDF)  
+        - 📝 Take a survey to manually input budget values  
+        - 📊 Visualize extracted indicators in charts  
+        - 🔐 Login for secure access (future integration)  
+        """
+    )
+    st.image(
+        "https://images.unsplash.com/photo-1502786129293-79981df4e689",
+        caption="Climate Action",
+        use_container_width=True
+    )
+
+# ---------------- Upload Document Page ----------------
+elif menu == "📑 Upload Document":
+    st.header("📑 Upload a Budget Document")
+
+    uploaded_file = st.file_uploader(
+        "Upload a budget document (PDF, max 5MB)",
+        type=["pdf"],
+        key="pdf_file"
+    )
 
     if uploaded_file:
-        if uploaded_file.size > 5 * 1024 * 1024:
+        if uploaded_file.size > 5 * 1024 * 1024:  # 5MB size limit
             st.error("⚠️ File size exceeds 5MB. Please upload a smaller document.")
         else:
-            text = extract_text_from_pdf(io.BytesIO(uploaded_file.read()))
-            st.subheader("Extracted Text Preview (first 1000 chars)")
-            st.text(text[:1000])
+            # Read PDF text
+            reader = PdfReader(uploaded_file)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text() or ""
+            st.success("✅ Document uploaded successfully")
 
-            # Extract numbers from PDF text automatically
-            extracted_values = extract_values_from_text(text)
+            # -------- Auto-filled placeholders (replace with your extractor when ready) --------
+            # These are pre-filled so the user can immediately calculate or edit if needed.
+            st.subheader("📑 Extracted Values (from PDF)")
+            col1, col2 = st.columns(2)
+            with col1:
+                total_budget_input = st.text_input(
+                    "Total national budget",
+                    value="1000000",  # auto-filled placeholder
+                    key="pdf_total_budget"
+                )
+                public_invest_input = st.text_input(
+                    "Public climate investment (total)",
+                    value="200000",  # auto-filled placeholder
+                    key="pdf_public_invest"
+                )
+            with col2:
+                adapt_budget_input = st.text_input(
+                    "Adaptation budget",
+                    value="120000",  # auto-filled placeholder
+                    key="pdf_adaptation"
+                )
+                mitig_budget_input = st.text_input(
+                    "Mitigation budget",
+                    value="80000",  # auto-filled placeholder
+                    key="pdf_mitigation"
+                )
 
-            total_budget_input = st.text_input(
-                "Total national budget",
-                value=extracted_values.get("total_budget", ""),
-                key="pdf_total_budget"
+            # -------- Chart visualization (Plotly) --------
+            st.subheader("📊 Visualization of Indicators")
+            labels = ["Public Investment", "Adaptation", "Mitigation"]
+
+            percentages = calc_percentages(
+                total_budget_input, public_invest_input, adapt_budget_input, mitig_budget_input
             )
-            public_invest_input = st.text_input(
-                "Public climate investment",
-                value=extracted_values.get("public_investment", ""),
-                key="pdf_public_invest"
-            )
-            adaptation_input = st.text_input(
-                "Adaptation budget",
-                value=extracted_values.get("adaptation_budget", ""),
-                key="pdf_adaptation"
-            )
-            private_input = st.text_input(
-                "Private sector investment",
-                value=extracted_values.get("private_investment", ""),
-                key="pdf_private_invest"
-            )
+            fig = bar_percent_chart(labels, percentages, "Climate Finance Indicators")
+            st.plotly_chart(fig, use_container_width=True)
 
-            if st.button("Calculate Indicators from Document", key="calc_pdf"):
-                tb = parse_number(total_budget_input)
-                pub = parse_number(public_invest_input)
-                adapt = parse_number(adaptation_input)
-                priv = parse_number(private_input)
+# ---------------- Take Survey Page ----------------
+elif menu == "📝 Take Survey":
+    st.header("📝 Survey / Manual Input")
 
-                results = calculate_indicators(tb, pub, adapt, priv)
+    col1, col2 = st.columns(2)
+    with col1:
+        survey_total_budget = st.text_input("Total national budget", value="", key="survey_total_budget")
+        survey_public_invest = st.text_input("Public climate investment (total)", value="", key="survey_public_invest")
+    with col2:
+        survey_adapt_budget = st.text_input("Adaptation budget", value="", key="survey_adaptation")
+        survey_mitig_budget = st.text_input("Mitigation budget", value="", key="survey_mitigation")
 
-                st.subheader("📊 Results")
-                st.write(results)
+    st.subheader("⚙️ Settings")
+    currency = st.text_input("Currency (e.g. KES, USD, EUR)", value="KES", key="extra_currency")
+    notes = st.text_area("Additional Notes", key="extra_notes")
 
-                # Plot chart
-                fig, ax = plt.subplots()
-                labels = ['Public', 'Private', 'Adaptation of Budget']
-                values = [
-                    results['pct_public'] or 0,
-                    results['pct_private'] or 0,
-                    results['pct_adaptation_of_budget'] or 0
-                ]
-                ax.bar(labels, values, color=['skyblue', 'orange', 'green'])
-                ax.set_ylabel("Percentage (%)")
-                ax.set_title("Climate Finance Indicators in Percentage")
-                st.pyplot(fig)
+    # Live chart preview as they type (nice UX)
+    st.subheader("📊 Live Preview")
+    survey_percentages = calc_percentages(
+        survey_total_budget, survey_public_invest, survey_adapt_budget, survey_mitig_budget
+    )
+    fig_survey = bar_percent_chart(
+        ["Public Investment", "Adaptation", "Mitigation"],
+        survey_percentages,
+        "Climate Finance Indicators (Survey)"
+    )
+    st.plotly_chart(fig_survey, use_container_width=True)
 
-# -------- Survey / Manual Input Tab --------
-with tab2:
-    st.header("Survey / Manual Input")
-
-    total_budget_in = st.text_input("Total national budget", key="survey_total_budget")
-    public_invest_in = st.text_input("Public climate investment", key="survey_public_invest")
-    adaptation_in = st.text_input("Adaptation budget", key="survey_adaptation")
-    private_invest_in = st.text_input("Private sector investment", key="survey_private_invest")
-
-    if st.button("Calculate Indicators from Survey", key="calc_survey"):
-        tb = parse_number(total_budget_in)
-        pub = parse_number(public_invest_in)
-        adapt = parse_number(adaptation_in)
-        priv = parse_number(private_invest_in)
-
-        results = calculate_indicators(tb, pub, adapt, priv)
-
-        st.subheader("📊 Results")
-        st.write(results)
-
-        fig, ax = plt.subplots()
-        labels = ['Public', 'Private', 'Adaptation of Budget']
-        values = [
-            results['pct_public'] or 0,
-            results['pct_private'] or 0,
-            results['pct_adaptation_of_budget'] or 0
-        ]
-        ax.bar(labels, values, color=['skyblue', 'orange', 'green'])
-        ax.set_ylabel("Percentage (%)")
-        ax.set_title("Climate Finance Indicators in Percentage")
-        st.pyplot(fig)
+# ---------------- Login Page ----------------
+elif menu == "🔐 Login":
+    st.header("🔐 Login")
+    username = st.text_input("Username", key="login_user")
+    password = st.text_input("Password", type="password", key="login_pass")
+    if st.button("Login"):
+        if username == "admin" and password == "admin":  # Placeholder logic
+            st.success("✅ Login successful!")
+        else:
+            st.error("❌ Invalid username or password")
