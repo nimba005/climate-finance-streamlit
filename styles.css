@@ -1,0 +1,74 @@
+/* Main background */
+.stApp {
+    background-color: #f9fafa;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar styling */
+section[data-testid="stSidebar"] {
+    background-color: #1b4332;
+    color: white;
+}
+section[data-testid="stSidebar"] .st-radio label {
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Titles */
+h1, h2, h3 {
+    color: #1b4332;
+}
+
+/* Buttons */
+div.stButton > button {
+    background-color: #2d6a4f;
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.6em 1.2em;
+    border: none;
+}
+div.stButton > button:hover {
+    background-color: #40916c;
+    color: white;
+}
+
+/* Inputs */
+.stTextInput input, .stTextArea textarea {
+    border-radius: 8px;
+}
+
+/* Top Header */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1b4332;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+}
+.top-header h2 {
+    margin: 0;
+}
+.top-header p {
+    margin: 2px 0 0 0;
+    font-size: 0.9em;
+    color: #555;
+}
+.top-header .header-right {
+    font-size: 0.9em;
+}
+
+/* Footer styling */
+.footer {
+    text-align: center;
+    padding: 15px;
+    color: #555;
+}
+.footer a {
+    color: #2d6a4f;
+    text-decoration: none;
+}
+.footer a:hover {
+    text-decoration: underline;
+}
