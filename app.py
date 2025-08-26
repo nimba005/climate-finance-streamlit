@@ -2,7 +2,6 @@ import streamlit as st
 import os
 import json
 from backend import calc_percentages, bar_percent_chart, extract_text_from_pdf
-from PyPDF2 import PdfReader
 
 # ---------------- Page Config ----------------
 st.set_page_config(
