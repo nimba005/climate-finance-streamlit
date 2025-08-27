@@ -1,7 +1,7 @@
 streamlit
 PyMuPDF
+plotly
 pandas
-matplotlib
-PyPDF2
-openpyxl
 numpy
+fastapi
+uvicorn
