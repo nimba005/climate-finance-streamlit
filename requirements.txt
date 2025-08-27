@@ -1,5 +1,7 @@
 streamlit
+PyMuPDF
 pandas
 matplotlib
 PyPDF2
 openpyxl
+numpy
