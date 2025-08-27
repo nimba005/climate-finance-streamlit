@@ -7,6 +7,8 @@ from backend import (
     extract_numbers_from_text,
     bar_chart,
     radar_chart,
+    extract_agriculture_budget,
+    agriculture_bar_chart
 )
 
 # ---------------- Page Config ----------------
@@ -95,6 +97,17 @@ elif menu == "📑 Upload Document":
         
         with st.expander("📑 Extracted Text Preview"):
             st.text_area("Extracted Text", text[:3000], height=200)
+
+             # ---- Agriculture Analysis ----
+        st.subheader("🌾 Agriculture Budget Analysis")
+        from backend import extract_agriculture_budget, agriculture_bar_chart
+        df, totals = extract_agriculture_budget(text)
+        if df is not None:
+            st.dataframe(df, use_container_width=True)
+            st.write("**Agriculture Totals:**", totals)
+            st.plotly_chart(agriculture_bar_chart(df, totals, year=2024), use_container_width=True)
+        else:
+            st.info("No agriculture budget data detected.")
 
         # 🔎 Auto-extract figures
         st.subheader("📊 Auto-Extracted Key Figures")

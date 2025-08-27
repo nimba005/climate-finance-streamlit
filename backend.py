@@ -1,50 +1,16 @@
+
+
 # backend.py
-import fitz  # PyMuPDF (better than PyPDF2 for large PDFs)
+import fitz  # PyMuPDF
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import re
 
-# ---- CMAT Indicators Definition ----
+# ---- CMAT Indicators ----
 CMAT_INDICATORS = {
-    "Finance": [
-        "Total Budget",
-        "Public",
-        "Adaptation",
-        "Mitigation"
-    ],
-    "Sectors": [
-        "Energy",
-        "Agriculture",
-        "Health",
-        "Transport",
-        "Water"
-    ],
-}
-
-# ---- Country-Specific Thresholds ----
-COUNTRY_THRESHOLDS = {
-    "Zambia": {
-        "Public": 50.0,       # 50% of total budget
-        "Adaptation": 5.0,    # 5% of total budget
-        "Mitigation": 5.0,    # 5% of total budget
-    },
-    "Kenya": {
-        "Public": 45.0,
-        "Adaptation": 7.0,
-        "Mitigation": 6.0,
-    },
-    "Uganda": {
-        "Public": 40.0,
-        "Adaptation": 6.0,
-        "Mitigation": 4.0,
-    },
-}
-
-DEFAULT_THRESHOLDS = {
-    "Public": 50.0,
-    "Adaptation": 5.0,
-    "Mitigation": 5.0,
+    "Finance": ["Total Budget", "Public", "Adaptation", "Mitigation"],
+    "Sectors": ["Energy", "Agriculture", "Health", "Transport", "Water"],
 }
 
 # ---- PDF Extraction ----
@@ -56,6 +22,71 @@ def extract_text_from_pdf(uploaded_file, max_pages=None):
                 break
             text.append(page.get_text("text") or "")
     return "\n".join(text)
+
+# ---- Agriculture Budget Extraction ----
+def extract_agriculture_budget(text: str):
+    """
+    Extracts agriculture budget lines from text and returns DataFrame + totals.
+    """
+    rows = []
+    pattern = re.compile(
+        r"(?P<programme>[A-Za-z\s\-\(\)]+)\s+\d+\s+(?P<budget2024>[\d,]+)\s+(?P<budget2023>[\d,]+)\s+(?P<budget2022>[\d,]+)"
+    )
+
+    for match in pattern.finditer(text):
+        prog = match.group("programme").strip()
+        if "agric" in prog.lower():
+            rows.append({
+                "Programme": prog,
+                "2024": float(match.group("budget2024").replace(",", "")),
+                "2023": float(match.group("budget2023").replace(",", "")),
+                "2022": float(match.group("budget2022").replace(",", "")),
+            })
+
+    df = pd.DataFrame(rows)
+    if df.empty:
+        return None, None
+
+    totals = df[["2022", "2023", "2024"]].sum().to_dict()
+    return df, totals
+
+def agriculture_bar_chart(df, totals, year=2024):
+    """
+    Simple bar chart for agriculture programmes in a given year.
+    """
+    fig = px.bar(
+        df,
+        x="Programme",
+        y=str(year),
+        title=f"Agriculture Budget {year}",
+        text=str(year),
+        template="plotly_white"
+    )
+    fig.update_traces(texttemplate="%{text}", textposition="outside")
+    fig.update_layout(margin=dict(t=60, r=20, l=20, b=40))
+    return fig
+
+
+# ---- Generic Charts ----
+def bar_chart(data_dict, title):
+    df = pd.DataFrame({"Indicator": list(data_dict.keys()), "Value": list(data_dict.values())})
+    fig = px.bar(df, x="Indicator", y="Value", text="Value", title=title, template="plotly_white")
+    fig.update_traces(texttemplate="%{text}", textposition="outside")
+    fig.update_layout(margin=dict(t=60, r=20, l=20, b=40))
+    return fig
+
+def radar_chart(data_dict, title):
+    indicators = list(data_dict.keys())
+    values = list(data_dict.values())
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(r=values, theta=indicators, fill="toself", name="Indicators"))
+    fig.update_layout(
+        polar=dict(radialaxis=dict(visible=True)),
+        showlegend=False,
+        title=title,
+        template="plotly_white"
+    )
+    return fig
 
 # ---- Extract Numeric Values ----
 def extract_numbers_from_text(text, keywords=None):
