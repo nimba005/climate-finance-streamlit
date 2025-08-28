@@ -8,7 +8,9 @@ from backend import (
     bar_chart,
     radar_chart,
     extract_agriculture_budget,
-    agriculture_bar_chart
+    agriculture_bar_chart,
+    extract_climate_programmes,   # ✅ Added
+    climate_bar_chart             # ✅ Added
 )
 
 # ---------------- Page Config ----------------
@@ -100,6 +102,15 @@ elif menu == "📑 Upload Document":
         
         with st.expander("📑 Extracted Text Preview"):
             st.text_area("Extracted Text", text[:3000], height=200)
+
+        # ---- Climate Programmes Analysis ----
+        st.subheader("🌍 Climate Programmes (2024 Focus)")
+        climate_df = extract_climate_programmes(text)
+        if climate_df is not None:
+            st.dataframe(climate_df, use_container_width=True)
+            st.plotly_chart(climate_bar_chart(climate_df), use_container_width=True)
+        else:
+            st.info("No climate programme data detected (codes 07, 17, 18, 41, 61).")
 
         # ---- Agriculture Analysis ----
         st.subheader("🌾 Agriculture Budget Analysis")

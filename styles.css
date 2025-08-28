@@ -8,19 +8,33 @@
 section[data-testid="stSidebar"] {
     background-color: #1b4332;
     color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers vertically */
+    align-items: center;     /* Centers horizontally */
+    height: 100vh;           /* Full height */
 }
+
+/* Sidebar radio buttons container */
+section[data-testid="stSidebar"] .stRadio {
+    width: 100%; /* Make it fill sidebar width */
+}
+
+/* Radio button labels */
 section[data-testid="stSidebar"] .st-radio label {
     color: white !important;
     font-weight: 600;
-    font-size: 1.2em; /* Large text */
-    padding: 10px 5px; /* Add spacing */
+    font-size: 1.6em; /* Larger text */
+    padding: 20px 10px; /* More spacing */
     display: flex;
     align-items: center;
+    justify-content: center; /* Center icons + text */
 }
 
+/* Make icons larger */
 section[data-testid="stSidebar"] .st-radio label span {
-    font-size: 1.5em;      /* Make icons larger */
-    margin-right: 8px;
+    font-size: 2em;    
+    margin-right: 12px;
 }
 
 /* Titles */

@@ -183,3 +183,51 @@ def bar_percent_chart(labels, percentages, title, country="Default"):
     )
     fig.update_yaxes(range=[0, max_y])
     return fig
+
+# ---- Climate Programmes Extraction ----
+def extract_climate_programmes(text: str):
+    """
+    Extracts 2024 budget allocations for specific climate-related programmes
+    (07, 17, 18, 41, 61) by capturing the last number on each relevant line.
+    """
+    rows = []
+    climate_codes = {
+        "07": "Irrigation Development",
+        "17": "Irrigation Development Support Programme",
+        "18": "Farming Systems and Social Sciences",
+        "41": "Chiansi Water Development Project",
+        "61": "Programme for Adaptation of Climate Change (PIDACC) Zambezi",
+    }
+
+    for code, name in climate_codes.items():
+        # Match the programme line starting with the code
+        pattern = re.compile(rf"^{code}\s.*?(?P<amount>[\d,]+)\s*$", re.MULTILINE)
+        matches = pattern.findall(text)
+        if matches:
+            # take the last number on that line
+            amount_str = matches[-1].replace(",", "").strip()
+            try:
+                budget2024 = float(amount_str)
+                rows.append({"Programme": f"{code} - {name}", "2024": budget2024})
+            except ValueError:
+                continue
+
+    df = pd.DataFrame(rows)
+    return df if not df.empty else None
+
+
+def climate_bar_chart(df):
+    """
+    Bar chart for climate programmes (2024 budgets).
+    """
+    fig = px.bar(
+        df,
+        x="Programme",
+        y="2024",
+        text="2024",
+        title="🌍 Climate-Tagged Programmes Budget 2024",
+        template="plotly_white"
+    )
+    fig.update_traces(texttemplate="%{text}", textposition="outside")
+    fig.update_layout(margin=dict(t=60, r=20, l=20, b=40), yaxis_title="Budget (ZMW)")
+    return fig
