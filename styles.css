@@ -12,6 +12,15 @@ section[data-testid="stSidebar"] {
 section[data-testid="stSidebar"] .st-radio label {
     color: white !important;
     font-weight: 600;
+    font-size: 1.2em; /* Large text */
+    padding: 10px 5px; /* Add spacing */
+    display: flex;
+    align-items: center;
+}
+
+section[data-testid="stSidebar"] .st-radio label span {
+    font-size: 1.5em;      /* Make icons larger */
+    margin-right: 8px;
 }
 
 /* Titles */

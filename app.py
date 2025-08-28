@@ -39,7 +39,10 @@ if "current_user" not in st.session_state:
 
 # ---------------- Sidebar ----------------
 st.sidebar.title("🌍 CMAT Tool")
-menu = st.sidebar.radio("Navigate", ["🏠 Home", "📑 Upload Document", "📝 Indicators Survey", "🔐 Login"])
+menu = st.sidebar.radio(
+    "Navigate",
+    ["🏠 Home", "📑 Upload Document", "📝 Indicators Survey", "🔐 Login"]
+)
 
 page_titles = {
     "🏠 Home": "Home",
@@ -69,7 +72,7 @@ if menu == "🏠 Home":
         This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
         **Green Economy and Climate Change Programme**.
         """)
-    st.image("https://images.unsplash.com/photo-1502786129293-79981df4e689", use_container_width=True)
+    st.image("https://images.unsplash.com/photo-1502786129293-79981df4e689", width=500)
     
     st.subheader("🏷 Featured National Climate Projects")
     st.markdown("""
@@ -92,15 +95,14 @@ elif menu == "📑 Upload Document":
     st.header("📑 Upload a Budget or Climate Policy Document")
     uploaded_file = st.file_uploader("Upload PDF", type=["pdf"])
     if uploaded_file:
-        text = extract_text_from_pdf(uploaded_file, max_pages=10)  # limit preview
+        text = extract_text_from_pdf(uploaded_file, max_pages=10)
         st.success("✅ Document uploaded and processed")
         
         with st.expander("📑 Extracted Text Preview"):
             st.text_area("Extracted Text", text[:3000], height=200)
 
-             # ---- Agriculture Analysis ----
+        # ---- Agriculture Analysis ----
         st.subheader("🌾 Agriculture Budget Analysis")
-        from backend import extract_agriculture_budget, agriculture_bar_chart
         df, totals = extract_agriculture_budget(text)
         if df is not None:
             st.dataframe(df, use_container_width=True)
@@ -128,7 +130,6 @@ elif menu == "📑 Upload Document":
         if extracted:
             st.write("Extracted Values:", extracted)
 
-            # Map extracted to indicators
             numeric_results = {}
             if "total public investment in climate initiatives" in extracted:
                 numeric_results["Total Budget"] = extracted["total public investment in climate initiatives"]
@@ -161,7 +162,7 @@ elif menu == "📝 Indicators Survey":
                 try:
                     results[ind] = float(val) if val else 0
                 except:
-                    results[ind] = val  # keep as text if not numeric
+                    results[ind] = val
 
     st.subheader("📊 Visualizations")
     numeric_results = {k: v for k, v in results.items() if isinstance(v, (int, float))}
@@ -179,7 +180,7 @@ elif menu == "🔐 Login":
         if st.button("🚪 Logout"):
             st.session_state.logged_in = False
             st.session_state.current_user = None
-            st.experimental_rerun()
+            st.rerun()
     else:
         option = st.radio("Select Option", ["Login", "Sign Up"])
         if option == "Login":
@@ -188,7 +189,7 @@ elif menu == "🔐 Login":
             if st.button("Login"):
                 if u in st.session_state.users and st.session_state.users[u] == p:
                     st.session_state.logged_in, st.session_state.current_user = True, u
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.error("❌ Invalid credentials")
         else:
@@ -201,3 +202,11 @@ elif menu == "🔐 Login":
                     st.session_state.users[u] = p
                     save_users(st.session_state.users)
                     st.success(f"✅ Account created for {u}. Please login.")
+
+# ---------------- Footer ----------------
+st.markdown("""
+<div class="footer">
+    <p>🌍 Climate Monitoring & Accountability Tool (CMAT) — Supporting Zambia’s Climate Action Oversight</p>
+    <p>© 2025 CMAT | Built with ❤️ using Streamlit</p>
+</div>
+""", unsafe_allow_html=True)
