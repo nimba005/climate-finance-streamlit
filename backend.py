@@ -189,34 +189,43 @@ def extract_climate_programmes(text: str):
     """
     Extracts 2023 and 2024 budget allocations for climate-related programmes
     (07, 17, 18, 41, 61).
-    Assumes line format: CODE ... 2023 ... 2024
+    Handles lines with 2 or 3 numbers before programme name.
     """
     rows = []
     climate_codes = {
         "07": "Irrigation Development",
         "17": "Irrigation Development Support Programme",
-        "18": "Farming Systems and Social Sciences",
+        "18": "Farming Systems / SCRALA",
         "41": "Chiansi Water Development Project",
         "61": "Programme for Adaptation of Climate Change (PIDACC) Zambezi",
     }
 
     for code, name in climate_codes.items():
-        # Look for lines starting with the programme code
-        pattern = re.compile(rf"^{code}\s.*?(?P<num1>[\d,]+).*?(?P<num2>[\d,]+)\s*$", re.MULTILINE)
+        # Match lines starting with programme code
+        # Allow 2–3 numbers before the text
+        pattern = re.compile(
+            rf"^{code}\s+(?P<num1>[\d,]+)?\s*(?P<num2>[\d,]+)?\s*(?P<num3>[\d,]+)?",
+            re.MULTILINE
+        )
         matches = pattern.findall(text)
         if matches:
-            # typically last two numbers are 2023 and 2024
-            num1, num2 = matches[-1]
-            try:
-                budget2023 = float(num1.replace(",", ""))
-                budget2024 = float(num2.replace(",", ""))
-                rows.append({
-                    "Programme": f"{code} - {name}",
-                    "2023": budget2023,
-                    "2024": budget2024
-                })
-            except ValueError:
+            nums = [n for n in matches[-1] if n]  # remove empty
+            if len(nums) == 2:
+                # if only two → assume 2023 + 2024
+                budget2023 = float(nums[0].replace(",", ""))
+                budget2024 = float(nums[1].replace(",", ""))
+            elif len(nums) == 3:
+                # if three → assume 2022 + 2023 + 2024
+                budget2023 = float(nums[1].replace(",", ""))
+                budget2024 = float(nums[2].replace(",", ""))
+            else:
                 continue
+
+            rows.append({
+                "Programme": f"{code} - {name}",
+                "2023": budget2023,
+                "2024": budget2024
+            })
 
     df = pd.DataFrame(rows)
     return df if not df.empty else None
