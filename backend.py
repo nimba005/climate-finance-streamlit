@@ -187,8 +187,9 @@ def bar_percent_chart(labels, percentages, title, country="Default"):
 # ---- Climate Programmes Extraction ----
 def extract_climate_programmes(text: str):
     """
-    Extracts 2024 budget allocations for specific climate-related programmes
-    (07, 17, 18, 41, 61) by capturing the last number on each relevant line.
+    Extracts 2023 and 2024 budget allocations for climate-related programmes
+    (07, 17, 18, 41, 61).
+    Assumes line format: CODE ... 2023 ... 2024
     """
     rows = []
     climate_codes = {
@@ -200,15 +201,20 @@ def extract_climate_programmes(text: str):
     }
 
     for code, name in climate_codes.items():
-        # Match the programme line starting with the code
-        pattern = re.compile(rf"^{code}\s.*?(?P<amount>[\d,]+)\s*$", re.MULTILINE)
+        # Look for lines starting with the programme code
+        pattern = re.compile(rf"^{code}\s.*?(?P<num1>[\d,]+).*?(?P<num2>[\d,]+)\s*$", re.MULTILINE)
         matches = pattern.findall(text)
         if matches:
-            # take the last number on that line
-            amount_str = matches[-1].replace(",", "").strip()
+            # typically last two numbers are 2023 and 2024
+            num1, num2 = matches[-1]
             try:
-                budget2024 = float(amount_str)
-                rows.append({"Programme": f"{code} - {name}", "2024": budget2024})
+                budget2023 = float(num1.replace(",", ""))
+                budget2024 = float(num2.replace(",", ""))
+                rows.append({
+                    "Programme": f"{code} - {name}",
+                    "2023": budget2023,
+                    "2024": budget2024
+                })
             except ValueError:
                 continue
 
@@ -216,18 +222,53 @@ def extract_climate_programmes(text: str):
     return df if not df.empty else None
 
 
-def climate_bar_chart(df):
+def extract_total_budget(text: str):
     """
-    Bar chart for climate programmes (2024 budgets).
+    Extracts the overall total 2024 budget value.
+    Looks for the biggest number near the word 'Total'.
     """
+    pattern = re.compile(r"Total.*?([\d,]+)", re.IGNORECASE)
+    matches = pattern.findall(text)
+    if matches:
+        # take the largest number (total is usually the biggest figure)
+        numbers = [float(m.replace(",", "")) for m in matches]
+        return max(numbers)
+    return None
+
+
+def climate_bar_chart(df, total_budget=None):
+    """
+    Bar chart for climate programmes (2023 vs 2024 budgets).
+    If total_budget is provided, also show % share.
+    """
+    melted = df.melt(id_vars=["Programme"], value_vars=["2023", "2024"], var_name="Year", value_name="Budget")
+
     fig = px.bar(
-        df,
+        melted,
         x="Programme",
-        y="2024",
-        text="2024",
-        title="🌍 Climate-Tagged Programmes Budget 2024",
+        y="Budget",
+        color="Year",
+        barmode="group",
+        text="Budget",
+        title="🌍 Climate-Tagged Programmes Budget (2023 vs 2024)",
         template="plotly_white"
     )
     fig.update_traces(texttemplate="%{text}", textposition="outside")
     fig.update_layout(margin=dict(t=60, r=20, l=20, b=40), yaxis_title="Budget (ZMW)")
+
+    # Add % share annotations if total provided
+    if total_budget:
+        annotations = []
+        for _, row in df.iterrows():
+            share = (row["2024"] / total_budget) * 100 if total_budget else 0
+            annotations.append(dict(
+                x=row["Programme"],
+                y=row["2024"],
+                text=f"{share:.2f}%",
+                showarrow=False,
+                yshift=20,
+                font=dict(color="blue", size=12)
+            ))
+        fig.update_layout(annotations=annotations)
+
     return fig

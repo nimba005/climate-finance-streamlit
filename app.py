@@ -9,8 +9,9 @@ from backend import (
     radar_chart,
     extract_agriculture_budget,
     agriculture_bar_chart,
-    extract_climate_programmes,   # ✅ Added
-    climate_bar_chart             # ✅ Added
+    extract_climate_programmes,
+    climate_bar_chart,
+    extract_total_budget   # ✅ Added this missing import
 )
 
 # ---------------- Page Config ----------------
@@ -104,11 +105,17 @@ elif menu == "📑 Upload Document":
             st.text_area("Extracted Text", text[:3000], height=200)
 
         # ---- Climate Programmes Analysis ----
-        st.subheader("🌍 Climate Programmes (2024 Focus)")
+        st.subheader("🌍 Climate Programmes (2023 vs 2024)")
         climate_df = extract_climate_programmes(text)
+        total_budget = extract_total_budget(text)
+
         if climate_df is not None:
             st.dataframe(climate_df, use_container_width=True)
-            st.plotly_chart(climate_bar_chart(climate_df), use_container_width=True)
+
+            if total_budget:
+                st.write(f"**Total 2024 Budget (all programmes):** {total_budget:,.0f} ZMW")
+
+            st.plotly_chart(climate_bar_chart(climate_df, total_budget=total_budget), use_container_width=True)
         else:
             st.info("No climate programme data detected (codes 07, 17, 18, 41, 61).")
 
