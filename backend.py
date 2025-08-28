@@ -184,12 +184,12 @@ def bar_percent_chart(labels, percentages, title, country="Default"):
     fig.update_yaxes(range=[0, max_y])
     return fig
 
-# ---- Climate Programmes Extraction ----
+
 def extract_climate_programmes(text: str):
     """
     Extracts 2023 and 2024 budget allocations for climate-related programmes
     (07, 17, 18, 41, 61).
-    Handles lines with 2 or 3 numbers before programme name.
+    Handles line breaks and ensures correct year mapping.
     """
     rows = []
     climate_codes = {
@@ -200,25 +200,19 @@ def extract_climate_programmes(text: str):
         "61": "Programme for Adaptation of Climate Change (PIDACC) Zambezi",
     }
 
+    # Normalize text: collapse multiple spaces and join broken lines
+    clean_text = re.sub(r"\s+", " ", text)
+
     for code, name in climate_codes.items():
-        # Match lines starting with programme code
-        # Allow 2–3 numbers before the text
-        pattern = re.compile(
-            rf"^{code}\s+(?P<num1>[\d,]+)?\s*(?P<num2>[\d,]+)?\s*(?P<num3>[\d,]+)?",
-            re.MULTILINE
-        )
-        matches = pattern.findall(text)
-        if matches:
-            nums = [n for n in matches[-1] if n]  # remove empty
-            if len(nums) == 2:
-                # if only two → assume 2023 + 2024
-                budget2023 = float(nums[0].replace(",", ""))
-                budget2024 = float(nums[1].replace(",", ""))
-            elif len(nums) == 3:
-                # if three → assume 2022 + 2023 + 2024
-                budget2023 = float(nums[1].replace(",", ""))
-                budget2024 = float(nums[2].replace(",", ""))
-            else:
+        # Look for the programme code followed by at least 3 numbers on the same logical line
+        pattern = re.compile(rf"\b{code}\b\s+([\d,]+)\s+([\d,]+).*?([\d,]+)")
+        match = pattern.search(clean_text)
+        if match:
+            try:
+                budget2022 = float(match.group(1).replace(",", ""))
+                budget2023 = float(match.group(2).replace(",", ""))
+                budget2024 = float(match.group(3).replace(",", ""))
+            except ValueError:
                 continue
 
             rows.append({
