@@ -11,7 +11,9 @@ from backend import (
     agriculture_bar_chart,
     extract_climate_programmes,
     climate_bar_chart,
-    extract_total_budget   # ✅ Added this missing import
+    extract_total_budget,
+    climate_multi_year_chart,
+    climate_2024_vs_total_chart
 )
 
 # ---------------- Page Config ----------------
@@ -115,7 +117,12 @@ elif menu == "📑 Upload Document":
             if total_budget:
                 st.write(f"**Total 2024 Budget (all programmes):** {total_budget:,.0f} ZMW")
 
-            st.plotly_chart(climate_bar_chart(climate_df, total_budget=total_budget), use_container_width=True)
+            # 1️⃣ Climate 2022 vs 2023 vs 2024 grouped bars + avg line
+            st.plotly_chart(climate_multi_year_chart(climate_df, total_budget=total_budget), use_container_width=True)
+
+            # 2️⃣ Climate 2024 vs total budget
+            st.plotly_chart(climate_2024_vs_total_chart(climate_df, total_budget=total_budget), use_container_width=True)
+
         else:
             st.info("No climate programme data detected (codes 07, 17, 18, 41, 61).")
 
@@ -225,6 +232,6 @@ elif menu == "🔐 Login":
 st.markdown("""
 <div class="footer">
     <p>🌍 Climate Monitoring & Accountability Tool (CMAT) — Supporting Zambia’s Climate Action Oversight</p>
-    <p>© 2025 CMAT | Built with ❤️ using Streamlit</p>
+    <p>© 2025 CMAT | Built with ❤️ AGNES</p>
 </div>
 """, unsafe_allow_html=True)

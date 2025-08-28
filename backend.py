@@ -275,3 +275,133 @@ def climate_bar_chart(df, total_budget=None):
         fig.update_layout(annotations=annotations)
 
     return fig
+
+def climate_2024_vs_total_chart(df, total_budget=10222074515):
+    """
+    Bar chart for climate programmes (2024 only) vs. total 2024 national budget.
+    """
+    # Build dataframe with climate 2024 figures
+    df_2024 = df[["Programme", "2024"]].copy()
+
+    fig = px.bar(
+        df_2024,
+        x="Programme",
+        y="2024",
+        text="2024",
+        title="🌍 Climate-Tagged Programmes (2024 vs Total Budget)",
+        template="plotly_white"
+    )
+
+    # Add total budget reference line
+    fig.add_hline(
+        y=total_budget,
+        line_dash="dash",
+        line_color="red",
+        annotation_text=f"Total Budget: {total_budget:,.0f} ZMW",
+        annotation_position="top left",
+        annotation_font=dict(color="red", size=12)
+    )
+
+    # Show budget figures on bars
+    fig.update_traces(texttemplate="%{text:,.0f}", textposition="outside")
+
+    # Format y-axis with commas
+    fig.update_layout(
+        yaxis_title="Budget (ZMW)",
+        yaxis_tickformat=",",
+        margin=dict(t=60, r=20, l=20, b=40)
+    )
+
+    return fig
+
+def climate_multi_year_chart(df, total_budget=None):
+    """
+    Grouped bar chart (2022 vs 2023 vs 2024) for climate programmes
+    (codes 07, 17, 18, 41, 61).
+    Y-axis = average total of 2022, 2023, 2024 budgets.
+    """
+    # Ensure 2022 is included
+    if "2022" not in df.columns:
+        df["2022"] = 0
+
+    melted = df.melt(
+        id_vars=["Programme"],
+        value_vars=["2022", "2023", "2024"],
+        var_name="Year",
+        value_name="Budget"
+    )
+
+    avg_total = melted.groupby("Year")["Budget"].sum().mean()
+
+    fig = px.bar(
+        melted,
+        x="Programme",
+        y="Budget",
+        color="Year",
+        barmode="group",
+        text="Budget",
+        title="🌍 Climate Programmes (2022 vs 2023 vs 2024)",
+        template="plotly_white"
+    )
+
+    fig.update_traces(texttemplate="%{text:,.0f}", textposition="outside")
+
+    # Average line
+    fig.add_hline(
+        y=avg_total,
+        line_dash="dot",
+        line_color="blue",
+        annotation_text=f"Avg 2022–2024 Total: {avg_total:,.0f} ZMW",
+        annotation_position="top left",
+        annotation_font=dict(color="blue", size=12)
+    )
+
+    fig.update_layout(
+        yaxis_title="Budget (ZMW)",
+        yaxis_tickformat=",",
+        margin=dict(t=60, r=20, l=20, b=40)
+    )
+    return fig
+
+
+def climate_2024_vs_total_chart(df, total_budget=10222074515):
+    """
+    Bar chart for climate programmes (2024 only) vs. total 2024 national budget.
+    Handles NoneType total_budget safely.
+    """
+    df_2024 = df[["Programme", "2024"]].copy()
+
+    fig = px.bar(
+        df_2024,
+        x="Programme",
+        y="2024",
+        text="2024",
+        title="🌍 Climate Programmes (2024 vs Total Budget)",
+        template="plotly_white"
+    )
+
+    # Ensure total_budget is a number
+    if total_budget is None:
+        total_budget = 0
+
+    # Add total budget reference line
+    fig.add_hline(
+        y=total_budget,
+        line_dash="dash",
+        line_color="red",
+        annotation_text=f"Total Budget: {total_budget:,.0f} ZMW" if total_budget else "Total Budget: N/A",
+        annotation_position="top left",
+        annotation_font=dict(color="red", size=12)
+    )
+
+    # Show budget figures on bars
+    fig.update_traces(texttemplate="%{text:,.0f}", textposition="outside")
+
+    # Format y-axis with commas
+    fig.update_layout(
+        yaxis_title="Budget (ZMW)",
+        yaxis_tickformat=",",
+        margin=dict(t=60, r=20, l=20, b=40)
+    )
+
+    return fig
