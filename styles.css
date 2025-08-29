@@ -132,3 +132,83 @@ div.stButton > button:hover {
     line-height: 1.4;
 }
 
+/* Footer */
+.footer {
+    background: #1b4332;
+    color: #fff;
+    padding: 40px 20px 20px;
+    margin-top: 50px;
+    border-radius: 12px 12px 0 0;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-section h4 {
+    font-size: 1.2em;
+    margin-bottom: 12px;
+    color: #95d5b2;
+}
+
+.footer-section p,
+.footer-section a {
+    font-size: 0.9em;
+    line-height: 1.6;
+    color: #eee;
+    text-decoration: none;
+}
+
+.footer-section a:hover {
+    color: #95d5b2;
+    text-decoration: underline;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 8px;
+}
+
+/* Social icons */
+.social-icons {
+    margin-top: 10px;
+}
+
+.social-icons img {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    transition: transform 0.2s ease-in-out;
+    filter: brightness(0) invert(1);
+}
+
+.social-icons img:hover {
+    transform: scale(1.1);
+    filter: brightness(0.8) invert(1);
+}
+
+/* Bottom copyright */
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.2);
+    margin-top: 30px;
+    padding-top: 15px;
+    text-align: center;
+    font-size: 0.85em;
+    color: #ccc;
+}
+
+
