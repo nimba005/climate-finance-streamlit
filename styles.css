@@ -237,6 +237,10 @@ div.stButton > button:hover {
     background: #40916c;
 }
 
+.top-navbar .active-nav {
+    background: #40916c !important;
+}
+
 .top-navbar button:focus {
     outline: none;
     background: #1b4332;
