@@ -77,57 +77,49 @@ if menu == "🏠 Home":
         This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
         **Green Economy and Climate Change Programme**.
         """)
-    st.image("https://images.unsplash.com/photo-1502786129293-79981df4e689", width=500)
-    
-    # 🎞 Dummy project images for slideshow
+
+    # 🎞 Project images for slideshow
     projects = [
-        {
-            "title": "Chisamba Solar Power Plant (100 MW)",
-            "desc": "Commissioned June 2025; helps diversify Zambia’s energy mix away from hydropower.",
-            "img": "https://images.unsplash.com/photo-1509395062183-67c5ad6faff9?w=800&q=60"
-        },
-        {
-            "title": "Itimpi Solar Power Station (60 MW)",
-            "desc": "Kitwe-based solar farm addressing electricity shortages, commissioned April 2024.",
-            "img": "https://images.unsplash.com/photo-1603565816030-d87e5069a0c1?w=800&q=60"
-        },
-        {
-            "title": "Zambia Riverside Solar Power Station (34 MW)",
-            "desc": "Expanded solar farm in Kitwe operational since February 2023.",
-            "img": "https://images.unsplash.com/photo-1584277261381-5d7f5d4b5c2d?w=800&q=60"
-        },
-        {
-            "title": "Growing Greener Project (Simalaha Conservancy)",
-            "desc": "Community-led project building resilience, combating desertification and boosting biodiversity.",
-            "img": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=60"
-        },
-        {
-            "title": "Strengthening Climate Resilience in the Barotse Sub-basin",
-            "desc": "CIF/World Bank-supported effort (2013–2022) to enhance local adaptation capacity.",
-            "img": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=60"
-        },
-        {
-            "title": "Early Warning Systems Project",
-            "desc": "UNDP-GEF initiative building Zambia’s hydro-meteorological monitoring infrastructure.",
-            "img": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=60"
-        },
-        {
-            "title": "National Adaptation Programme of Action (NAPA)",
-            "desc": "Targeted adaptation interventions prioritizing vulnerable sectors.",
-            "img": "https://images.unsplash.com/photo-1549887534-3db1bd59dcca?w=800&q=60"
-        },
-        {
-            "title": "NDC Implementation Framework",
-            "desc": "₮17.2 B Blueprint (2023–2030) aligning mitigation/adaptation with national development goals.",
-            "img": "https://images.unsplash.com/photo-1523978591478-c753949ff840?w=800&q=60"
-        },
+        {"title": "Chisamba Solar Power Plant (100 MW)",
+         "desc": "Commissioned June 2025; helps diversify Zambia’s energy mix away from hydropower.",
+         "img": "https://images.unsplash.com/photo-1509395062183-67c5ad6faff9?w=800&q=60"},
+        {"title": "Itimpi Solar Power Station (60 MW)",
+         "desc": "Kitwe-based solar farm addressing electricity shortages, commissioned April 2024.",
+         "img": "https://images.unsplash.com/photo-1603565816030-d87e5069a0c1?w=800&q=60"},
+        {"title": "Zambia Riverside Solar Power Station (34 MW)",
+         "desc": "Expanded solar farm in Kitwe operational since February 2023.",
+         "img": "https://images.unsplash.com/photo-1584277261381-5d7f5d4b5c2d?w=800&q=60"},
+        {"title": "Growing Greener Project (Simalaha Conservancy)",
+         "desc": "Community-led project building resilience, combating desertification and boosting biodiversity.",
+         "img": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=60"},
+        {"title": "Strengthening Climate Resilience in the Barotse Sub-basin",
+         "desc": "CIF/World Bank-supported effort (2013–2022) to enhance local adaptation capacity.",
+         "img": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=60"},
+        {"title": "Early Warning Systems Project",
+         "desc": "UNDP-GEF initiative building Zambia’s hydro-meteorological monitoring infrastructure.",
+         "img": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=60"},
+        {"title": "National Adaptation Programme of Action (NAPA)",
+         "desc": "Targeted adaptation interventions prioritizing vulnerable sectors.",
+         "img": "https://images.unsplash.com/photo-1549887534-3db1bd59dcca?w=800&q=60"},
+        {"title": "NDC Implementation Framework",
+         "desc": "₮17.2 B Blueprint (2023–2030) aligning mitigation/adaptation with national development goals.",
+         "img": "https://images.unsplash.com/photo-1523978591478-c753949ff840?w=800&q=60"},
     ]
 
     st.subheader("🏷 Featured National Climate Projects")
 
-    # Slideshow navigation (using session_state index)
+    # Slideshow state
     if "slide_index" not in st.session_state:
         st.session_state.slide_index = 0
+
+    # ⏱ Auto-advance every 5 seconds
+    # ⏱ Auto-advance every 5 seconds
+    count = st.query_params.get("refresh_count", ["0"])
+    if count:
+        st.session_state.slide_index = (st.session_state.slide_index + 1) % len(projects)
+
+    # Update query params
+    st.query_params["refresh_count"] = str(int(count[0]) + 1 if count else 1)
 
     col1, col2, col3 = st.columns([1, 4, 1])
 
