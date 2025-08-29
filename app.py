@@ -1,6 +1,7 @@
 # app.py
 import streamlit as st
 import os, json
+from streamlit_autorefresh import st_autorefresh
 from backend import (
     CMAT_INDICATORS,
     extract_text_from_pdf,
@@ -80,30 +81,14 @@ if menu == "🏠 Home":
 
     # 🎞 Project images for slideshow
     projects = [
-        {"title": "Chisamba Solar Power Plant (100 MW)",
-         "desc": "Commissioned June 2025; helps diversify Zambia’s energy mix away from hydropower.",
-         "img": "https://images.unsplash.com/photo-1509395062183-67c5ad6faff9?w=800&q=60"},
-        {"title": "Itimpi Solar Power Station (60 MW)",
-         "desc": "Kitwe-based solar farm addressing electricity shortages, commissioned April 2024.",
-         "img": "https://images.unsplash.com/photo-1603565816030-d87e5069a0c1?w=800&q=60"},
-        {"title": "Zambia Riverside Solar Power Station (34 MW)",
-         "desc": "Expanded solar farm in Kitwe operational since February 2023.",
-         "img": "https://images.unsplash.com/photo-1584277261381-5d7f5d4b5c2d?w=800&q=60"},
-        {"title": "Growing Greener Project (Simalaha Conservancy)",
-         "desc": "Community-led project building resilience, combating desertification and boosting biodiversity.",
-         "img": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=60"},
-        {"title": "Strengthening Climate Resilience in the Barotse Sub-basin",
-         "desc": "CIF/World Bank-supported effort (2013–2022) to enhance local adaptation capacity.",
-         "img": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=60"},
-        {"title": "Early Warning Systems Project",
-         "desc": "UNDP-GEF initiative building Zambia’s hydro-meteorological monitoring infrastructure.",
-         "img": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=60"},
-        {"title": "National Adaptation Programme of Action (NAPA)",
-         "desc": "Targeted adaptation interventions prioritizing vulnerable sectors.",
-         "img": "https://images.unsplash.com/photo-1549887534-3db1bd59dcca?w=800&q=60"},
-        {"title": "NDC Implementation Framework",
-         "desc": "₮17.2 B Blueprint (2023–2030) aligning mitigation/adaptation with national development goals.",
-         "img": "https://images.unsplash.com/photo-1523978591478-c753949ff840?w=800&q=60"},
+        {"title": "Chisamba Solar Power Plant (100 MW)", "desc": "Commissioned June 2025; helps diversify Zambia’s energy mix away from hydropower.", "img": "https://images.unsplash.com/photo-1509395062183-67c5ad6faff9?w=800&q=60"},
+        {"title": "Itimpi Solar Power Station (60 MW)", "desc": "Kitwe-based solar farm addressing electricity shortages, commissioned April 2024.", "img": "https://images.unsplash.com/photo-1603565816030-d87e5069a0c1?w=800&q=60"},
+        {"title": "Zambia Riverside Solar Power Station (34 MW)", "desc": "Expanded solar farm in Kitwe operational since February 2023.", "img": "https://images.unsplash.com/photo-1584277261381-5d7f5d4b5c2d?w=800&q=60"},
+        {"title": "Growing Greener Project (Simalaha Conservancy)", "desc": "Community-led project building resilience, combating desertification and boosting biodiversity.", "img": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=60"},
+        {"title": "Strengthening Climate Resilience in the Barotse Sub-basin", "desc": "CIF/World Bank-supported effort (2013–2022) to enhance local adaptation capacity.", "img": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=60"},
+        {"title": "Early Warning Systems Project", "desc": "UNDP-GEF initiative building Zambia’s hydro-meteorological monitoring infrastructure.", "img": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=60"},
+        {"title": "National Adaptation Programme of Action (NAPA)", "desc": "Targeted adaptation interventions prioritizing vulnerable sectors.", "img": "https://images.unsplash.com/photo-1549887534-3db1bd59dcca?w=800&q=60"},
+        {"title": "NDC Implementation Framework", "desc": "₮17.2 B Blueprint (2023–2030) aligning mitigation/adaptation with national development goals.", "img": "https://images.unsplash.com/photo-1523978591478-c753949ff840?w=800&q=60"},
     ]
 
     st.subheader("🏷 Featured National Climate Projects")
@@ -111,29 +96,31 @@ if menu == "🏠 Home":
     # Slideshow state
     if "slide_index" not in st.session_state:
         st.session_state.slide_index = 0
+    
+    if "refresh_count" not in st.session_state:
+        st.session_state.refresh_count = 0
 
-    # ⏱ Auto-advance every 5 seconds
-    # ⏱ Auto-advance every 5 seconds
-    count = st.query_params.get("refresh_count", ["0"])
-    if count:
+    # Auto-advance slideshow every 5s
+    refresh_count = st_autorefresh(interval=5000, key="slideshow_refresher")
+
+    if refresh_count > st.session_state.refresh_count:
+        st.session_state.refresh_count = refresh_count
         st.session_state.slide_index = (st.session_state.slide_index + 1) % len(projects)
-
-    # Update query params
-    st.query_params["refresh_count"] = str(int(count[0]) + 1 if count else 1)
 
     col1, col2, col3 = st.columns([1, 4, 1])
 
     with col1:
         if st.button("⬅️ Prev"):
             st.session_state.slide_index = (st.session_state.slide_index - 1) % len(projects)
+            st.rerun()
 
     with col3:
         if st.button("Next ➡️"):
             st.session_state.slide_index = (st.session_state.slide_index + 1) % len(projects)
+            st.rerun()
 
     project = projects[st.session_state.slide_index]
     with col2:
-        # 🆕 Use HTML with styled container instead of st.image
         st.markdown(
             f"""
             <div class="project-card">
@@ -173,10 +160,7 @@ elif menu == "📑 Upload Document":
             if total_budget:
                 st.write(f"**Total 2024 Budget (all programmes):** {total_budget:,.0f} ZMW")
 
-            # 1️⃣ Climate 2022 vs 2023 vs 2024 grouped bars + avg line
             st.plotly_chart(climate_multi_year_chart(climate_df, total_budget=total_budget), use_container_width=True)
-
-            # 2️⃣ Climate 2024 vs total budget
             st.plotly_chart(climate_2024_vs_total_chart(climate_df, total_budget=total_budget), use_container_width=True)
 
         else:
@@ -199,18 +183,13 @@ elif menu == "📑 Upload Document":
             keywords=[
                 "total public investment in climate initiatives",
                 "percentage of national budget allocated to climate adaptation",
-                "private sector investment mobilized",
-                "energy",
-                "agriculture",
-                "health",
-                "transport",
-                "water"
+                "private sector investment mobilized", "energy", "agriculture",
+                "health", "transport", "water"
             ]
         )
 
         if extracted:
             st.write("Extracted Values:", extracted)
-
             numeric_results = {}
             if "total public investment in climate initiatives" in extracted:
                 numeric_results["Total Budget"] = extracted["total public investment in climate initiatives"]
@@ -235,7 +214,6 @@ elif menu == "📝 Indicators Survey":
 
     st.header("📝 CMAT Indicators Input")
     results = {}
-
     for category, indicators in CMAT_INDICATORS.items():
         with st.expander(f"📊 {category} Indicators"):
             for ind in indicators:
@@ -287,7 +265,33 @@ elif menu == "🔐 Login":
 # ---------------- Footer ----------------
 st.markdown("""
 <div class="footer">
-    <p>🌍 Climate Monitoring & Accountability Tool (CMAT) — Supporting Zambia’s Climate Action Oversight</p>
-    <p>© 2025 CMAT | Built with ❤️ AGNES</p>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h4>About CMAT</h4>
+            <p>🌍 Climate Monitoring & Accountability Tool (CMAT) supports Zambia’s climate action oversight by tracking projects, budgets, and impact.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Projects</a></li>
+                <li><a href="#">Reports</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Contact</h4>
+            <p>Email: info@agneafrica.org</p>
+            <p>📍 Blue Violet Plaza, Kilimani</p>
+            <div class="social-icons">
+                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" width="20"/></a>
+                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" width="20"/></a>
+                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="LinkedIn" width="20"/></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 CMAT | Built with ❤️ by AGNES</p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
