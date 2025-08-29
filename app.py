@@ -287,36 +287,7 @@ elif menu == "🔐 Login":
 # ---------------- Footer ----------------
 st.markdown("""
 <div class="footer">
-    <div class="footer-container">
-        <div class="footer-section">
-            <h4>About CMAT</h4>
-            <p>🌍 Climate Monitoring & Accountability Tool (CMAT) supports Zambia’s climate action oversight by tracking projects, budgets, and impact.</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>Quick Links</h4>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Projects</a></li>
-                <li><a href="#">Reports</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-section">
-            <h4>Contact</h4>
-            <p>Email: info@agneafrica.org</p>
-            <p>📍 Blue Violet Plaza, Kilimani</p>
-            <div class="social-icons">
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" width="20"/></a>
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" width="20"/></a>
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="LinkedIn" width="20"/></a>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer-bottom">
-        <p>© 2025 CMAT | Built with ❤️ by AGNES</p>
-    </div>
+    <p>🌍 Climate Monitoring & Accountability Tool (CMAT) — Supporting Zambia’s Climate Action Oversight</p>
+    <p>© 2025 CMAT | Built with ❤️ AGNES</p>
 </div>
 """, unsafe_allow_html=True)
