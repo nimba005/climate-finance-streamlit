@@ -133,6 +133,14 @@ if menu == "🏠 Home":
             """,
             unsafe_allow_html=True
         )
+        # Dot indicators
+        dots = ""
+        for i in range(len(projects)):
+            if i == st.session_state.slide_index:
+                dots += f"<span style='font-size:22px; color:#007BFF;'>●</span> "
+            else:
+                dots += f"<span style='font-size:18px; color:gray;'>○</span> "
+        st.markdown(f"<div style='text-align:center; margin-top:10px;'>{dots}</div>", unsafe_allow_html=True)
 
 # ---------------- Upload Document ----------------
 elif menu == "📑 Upload Document":
