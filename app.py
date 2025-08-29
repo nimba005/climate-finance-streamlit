@@ -22,7 +22,7 @@ st.set_page_config(
     page_title="🌍 CMAT Tool",
     page_icon="🌍",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",  # hide sidebar since nav is on top
 )
 
 with open("styles.css") as f:
@@ -43,27 +43,20 @@ if "logged_in" not in st.session_state:
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
 
-# ---------------- Sidebar ----------------
-st.sidebar.title("🌍 CMAT Tool")
-menu = st.sidebar.radio(
-    "Navigate",
-    ["🏠 Home", "📑 Upload Document", "📝 Indicators Survey", "🔐 Login"]
+# ---------------- Top Navigation ----------------
+menu = st.radio(
+    "Navigation",
+    ["🏠 Home", "📑 Upload Document", "📝 Indicators Survey", "🔐 Login"],
+    horizontal=True,
+    label_visibility="collapsed",
 )
 
-page_titles = {
-    "🏠 Home": "Home",
-    "📑 Upload Document": "Upload Document",
-    "📝 Indicators Survey": "Survey",
-    "🔐 Login": "Login / Sign Up"
-}
-current_page = page_titles.get(menu, "")
-
+# ---------------- Header ----------------
 st.markdown(f"""
 <div class="top-header">
     <div class="header-left">
         <h2>🌍 Climate Monitoring & Accountability Tool (CMAT)</h2>
         <p>AI-enabled oversight tool for Zambia’s National Assembly</p>
-        <h4>Current Page: {current_page}</h4>
     </div>
     <div class="header-right">
         {"Logged in as: <strong>" + st.session_state.current_user + "</strong>" if st.session_state.logged_in else "Not logged in"}
