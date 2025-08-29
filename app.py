@@ -44,12 +44,29 @@ if "current_user" not in st.session_state:
     st.session_state.current_user = None
 
 # ---------------- Top Navigation ----------------
-menu = st.radio(
-    "Navigation",
-    ["🏠 Home", "📑 Upload Document", "📝 Indicators Survey", "🔐 Login"],
-    horizontal=True,
-    label_visibility="collapsed",
-)
+st.markdown("""
+<div class="top-navbar">
+    <form action="?nav=home"><button type="submit">🏠 Home</button></form>
+    <form action="?nav=upload"><button type="submit">📑 Upload Document</button></form>
+    <form action="?nav=survey"><button type="submit">📝 Indicators Survey</button></form>
+    <form action="?nav=login"><button type="submit">🔐 Login</button></form>
+</div>
+""", unsafe_allow_html=True)
+
+# Capture navigation choice from URL query param
+query_params = st.query_params
+nav = query_params.get("nav", "home")
+
+# Map back to menu variable (so the rest of code works unchanged)
+if nav == "home":
+    menu = "🏠 Home"
+elif nav == "upload":
+    menu = "📑 Upload Document"
+elif nav == "survey":
+    menu = "📝 Indicators Survey"
+elif nav == "login":
+    menu = "🔐 Login"
+
 
 # ---------------- Header ----------------
 st.markdown(f"""

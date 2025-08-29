@@ -214,7 +214,7 @@ div.stButton > button:hover {
 /* 🆕 Top Navbar */
 .top-navbar {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     gap: 15px;
     background: #1b4332;
     padding: 12px 20px;
