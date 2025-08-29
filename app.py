@@ -133,8 +133,19 @@ if menu == "🏠 Home":
 
     project = projects[st.session_state.slide_index]
     with col2:
-        st.image(project["img"], caption=project["title"], use_container_width=True)
-        st.markdown(f"**{project['title']}** – {project['desc']}")
+        # 🆕 Use HTML with styled container instead of st.image
+        st.markdown(
+            f"""
+            <div class="project-card">
+                <img src="{project['img']}" class="project-img"/>
+                <div class="project-text">
+                    <h4>{project['title']}</h4>
+                    <p>{project['desc']}</p>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 # ---------------- Upload Document ----------------
 elif menu == "📑 Upload Document":

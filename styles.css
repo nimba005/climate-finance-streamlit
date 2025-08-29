@@ -95,3 +95,40 @@ div.stButton > button:hover {
 .footer a:hover {
     text-decoration: underline;
 }
+
+/* 🆕 Project card container */
+.project-card {
+    text-align: center;
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 10px;
+    transition: transform 0.2s ease-in-out;
+}
+.project-card:hover {
+    transform: translateY(-4px);
+}
+
+/* 🆕 Consistent image size */
+.project-img {
+    width: 100%;
+    max-width: 450px; /* Controls max size */
+    height: 280px;    /* Fixed height */
+    object-fit: cover; /* Crop neatly without distortion */
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+/* 🆕 Text under images */
+.project-text h4 {
+    margin: 5px 0;
+    font-size: 1.1em;
+    color: #1b4332;
+}
+.project-text p {
+    font-size: 0.9em;
+    color: #444;
+    line-height: 1.4;
+}
+
