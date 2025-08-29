@@ -43,13 +43,35 @@ if "logged_in" not in st.session_state:
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
 
-# ---------------- Top Navigation ----------------
-menu = st.radio(
-    "Navigation",
-    ["🏠 Home", "📑 Upload Document", "📝 Indicators Survey", "🔐 Login"],
-    horizontal=True,
-    label_visibility="collapsed",
-)
+# ---------------- Top Navigation (Custom Green Bar) ----------------
+nav_options = {
+    "🏠 Home": "home",
+    "📑 Upload Document": "upload",
+    "📝 Indicators Survey": "survey",
+    "🔐 Login": "login"
+}
+
+# Set default nav
+if "nav" not in st.session_state:
+    st.session_state.nav = "home"
+
+# Build navbar with custom HTML + Streamlit buttons
+cols = st.columns(len(nav_options))
+
+for i, (label, key) in enumerate(nav_options.items()):
+    with cols[i]:
+        if st.button(label, key=f"nav_{key}"):
+            st.session_state.nav = key
+
+# Map session state nav to menu (so your existing logic still works)
+nav_map = {
+    "home": "🏠 Home",
+    "upload": "📑 Upload Document",
+    "survey": "📝 Indicators Survey",
+    "login": "🔐 Login",
+}
+menu = nav_map.get(st.session_state.nav, "🏠 Home")
+
 
 # ---------------- Header ----------------
 st.markdown(f"""
