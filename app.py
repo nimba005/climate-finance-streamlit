@@ -55,13 +55,16 @@ nav_options = {
 if "nav" not in st.session_state:
     st.session_state.nav = "home"
 
-# Build navbar with custom HTML + Streamlit buttons
-cols = st.columns(len(nav_options))
+# ---------------- Modern Top Navbar ----------------
+st.markdown('<div class="nav-container">', unsafe_allow_html=True)
 
+cols = st.columns([2, 1, 1, 1, 1])  # leave left side empty (2x space)
 for i, (label, key) in enumerate(nav_options.items()):
-    with cols[i]:
+    with cols[i+1]:  # start from second column (skip empty left space)
         if st.button(label, key=f"nav_{key}"):
             st.session_state.nav = key
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Map session state nav to menu (so your existing logic still works)
 nav_map = {
