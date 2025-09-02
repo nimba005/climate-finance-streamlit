@@ -1,6 +1,3 @@
-
-
-# backend.py
 import fitz  # PyMuPDF
 import pandas as pd
 import plotly.express as px
