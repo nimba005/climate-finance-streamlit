@@ -3,12 +3,71 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import re
+from openai import OpenAI
+import os, json
+from dotenv import load_dotenv
+from openai import RateLimitError, AuthenticationError
+
+load_dotenv()
+print("DEBUG: OPENAI_API_KEY loaded?", bool(os.getenv("OPENAI_API_KEY")))
+
 
 # ---- CMAT Indicators ----
 CMAT_INDICATORS = {
     "Finance": ["Total Budget", "Public", "Adaptation", "Mitigation"],
     "Sectors": ["Energy", "Agriculture", "Health", "Transport", "Water"],
 }
+
+# Initialize OpenAI
+# Load both keys from .env
+API_KEYS = [
+    os.getenv("OPENAI_API_KEY_1"),
+    os.getenv("OPENAI_API_KEY_2")
+]
+
+current_key_index = 0
+client = OpenAI(api_key=API_KEYS[current_key_index])
+
+def get_client():
+    """
+    Returns a working OpenAI client. 
+    If quota/auth errors happen, rotate to the next key.
+    """
+    global client, current_key_index
+    try:
+        return client
+    except (RateLimitError, AuthenticationError):
+        current_key_index = (current_key_index + 1) % len(API_KEYS)
+        client = OpenAI(api_key=API_KEYS[current_key_index])
+        print(f"⚠️ Switched to backup key #{current_key_index+1}")
+        return client
+
+def ai_extract_budget_info(text: str):
+    """
+    Uses GPT to analyze PDF text and extract structured budget data.
+    """
+    prompt = f"""
+    You are a financial data analyst. Extract budget allocations for climate-related programmes
+    (Energy, Agriculture, Health, Transport, Water, and total budget).
+    Return results as valid JSON with numeric values only.
+    
+    Text:
+    {text[:5000]}  # send only first 5k chars to avoid token overflow
+    """
+
+    c = get_client()
+    response = c.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0
+    )
+
+    try:
+        content = response.choices[0].message.content
+        return json.loads(content)  # Expect JSON output
+    except Exception as e:
+        print("AI parsing error:", e)
+        return {}
 
 # ---- PDF Extraction ----
 def extract_text_from_pdf(uploaded_file, max_pages=None):

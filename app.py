@@ -14,7 +14,8 @@ from backend import (
     climate_bar_chart,
     extract_total_budget,
     climate_multi_year_chart,
-    climate_2024_vs_total_chart
+    climate_2024_vs_total_chart,
+    ai_extract_budget_info
 )
 
 # ---------------- Page Config ----------------
@@ -55,16 +56,18 @@ nav_options = {
 if "nav" not in st.session_state:
     st.session_state.nav = "home"
 
-# ---------------- Modern Top Navbar ----------------
+# ---------------- Modern Top Navbar (Wrapped Inside Container) ----------------
 st.markdown('<div class="nav-container">', unsafe_allow_html=True)
 
-cols = st.columns([2, 1, 1, 1, 1])  # leave left side empty (2x space)
+cols = st.columns([2, 1, 1, 1, 1])  # keeps empty space from center-left, buttons align center→right
 for i, (label, key) in enumerate(nav_options.items()):
-    with cols[i+1]:  # start from second column (skip empty left space)
+    with cols[i+1]:
         if st.button(label, key=f"nav_{key}"):
             st.session_state.nav = key
 
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div></div>', unsafe_allow_html=True)
+
+
 
 # Map session state nav to menu (so your existing logic still works)
 nav_map = {
@@ -91,11 +94,13 @@ st.markdown(f"""
 
 # ---------------- Home ----------------
 if menu == "🏠 Home":
+    st.markdown('<div class="section">', unsafe_allow_html=True)
     st.subheader("Welcome to CMAT")
     st.markdown("""
         This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
         **Green Economy and Climate Change Programme**.
-        """)
+    """)
+    st.markdown('<div class="section">', unsafe_allow_html=True)
 
     # 🎞 Project images for slideshow
     projects = [
@@ -174,6 +179,17 @@ elif menu == "📑 Upload Document":
         
         with st.expander("📑 Extracted Text Preview"):
             st.text_area("Extracted Text", text[:3000], height=200)
+
+        # ---- AI-Powered Budget Extraction ----
+        st.subheader("🤖 AI-Extracted Budget Figures")
+        ai_results = ai_extract_budget_info(text)
+
+        if ai_results:
+            st.json(ai_results)  # pretty-print structured output
+            st.plotly_chart(bar_chart(ai_results, "AI Extracted Budget Indicators"), use_container_width=True)
+            st.plotly_chart(radar_chart(ai_results, "AI Composite View"), use_container_width=True)
+        else:
+            st.info("AI could not extract structured budget figures from this document.")
 
         # ---- Climate Programmes Analysis ----
         st.subheader("🌍 Climate Programmes (2023 vs 2024)")
