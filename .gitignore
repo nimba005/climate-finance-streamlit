@@ -13,4 +13,5 @@ __pycache__/
 Thumbs.db
 
 # PDF test files
-*.pdf
+*.pdf.env
+.env
