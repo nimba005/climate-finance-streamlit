@@ -6,10 +6,12 @@ import re
 from openai import OpenAI
 import os, json
 from dotenv import load_dotenv
+from openai import OpenAI
 from openai import RateLimitError, AuthenticationError
 
 load_dotenv()
-print("DEBUG: OPENAI_API_KEY loaded?", bool(os.getenv("OPENAI_API_KEY")))
+print("DEBUG: OPENAI_API_KEY_1 loaded?", bool(os.getenv("OPENAI_API_KEY_1")))
+print("DEBUG: OPENAI_API_KEY_2 loaded?", bool(os.getenv("OPENAI_API_KEY_2")))
 
 
 # ---- CMAT Indicators ----
@@ -42,6 +44,7 @@ def get_client():
         print(f"⚠️ Switched to backup key #{current_key_index+1}")
         return client
 
+
 def ai_extract_budget_info(text: str):
     """
     Uses GPT to analyze PDF text and extract structured budget data.
@@ -55,14 +58,15 @@ def ai_extract_budget_info(text: str):
     {text[:5000]}  # send only first 5k chars to avoid token overflow
     """
 
-    c = get_client()
-    response = c.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0
-    )
-
+   
     try:
+        c = get_client()
+        response = c.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0
+        )
+        
         content = response.choices[0].message.content
         return json.loads(content)  # Expect JSON output
     except Exception as e:
