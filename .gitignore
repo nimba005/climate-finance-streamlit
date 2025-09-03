@@ -15,3 +15,4 @@ Thumbs.db
 # PDF test files
 *.pdf.env
 .env
+.env
