@@ -143,19 +143,21 @@ if menu == "🏠 Home":
             st.rerun()
 
     project = projects[st.session_state.slide_index]
+
     with col2:
+        st.markdown('<div class="project-card">', unsafe_allow_html=True)
+        st.image(project['img'], use_container_width=True, caption=None)
         st.markdown(
             f"""
-            <div class="project-card">
-                <img src="{project['img']}" class="project-img"/>
-                <div class="project-text">
-                    <h4>{project['title']}</h4>
-                    <p>{project['desc']}</p>
-                </div>
+            <div class="project-text">
+                <h4>{project['title']}</h4>
+                <p>{project['desc']}</p>
             </div>
             """,
             unsafe_allow_html=True
         )
+        st.markdown('</div>', unsafe_allow_html=True)
+        
         # Dot indicators
         dots = ""
         for i in range(len(projects)):
