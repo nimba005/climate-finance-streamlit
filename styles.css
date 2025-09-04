@@ -113,8 +113,8 @@ div.stButton > button:hover {
 /* 🆕 Consistent image size */
 .project-img {
     width: 100%;
-    max-width: 450px; /* Controls max size */
-    height: 280px;    /* Fixed height */
+    max-width: 350px; /* Controls max size */
+    height: 160px;    /* Fixed height */
     object-fit: cover; /* Crop neatly without distortion */
     border-radius: 12px;
     margin-bottom: 10px;
