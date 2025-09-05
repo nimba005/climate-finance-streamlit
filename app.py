@@ -163,7 +163,14 @@ if menu == "🏠 Home":
 
     with col2:
         st.markdown('<div class="project-card">', unsafe_allow_html=True)
-        st.image(project['img'], use_container_width=True, caption=None)
+        st.markdown(
+            f"""
+            <img src="data:image/png;base64,{get_base64_image(project['img'])}" 
+                class="project-img" alt="{project['title']}"/>
+            """,
+            unsafe_allow_html=True
+    )
+
         st.markdown(
             f"""
             <div class="project-text">
