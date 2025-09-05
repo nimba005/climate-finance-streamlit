@@ -1,6 +1,7 @@
 # app.py
 import streamlit as st
 import os, json
+import base64
 from streamlit_autorefresh import st_autorefresh
 from backend import (
     CMAT_INDICATORS,
@@ -17,6 +18,11 @@ from backend import (
     climate_2024_vs_total_chart,
     ai_extract_budget_info
 )
+
+def get_base64_image(image_path):
+    with open(image_path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
 # ---------------- Page Config ----------------
 st.set_page_config(
@@ -57,7 +63,18 @@ if "nav" not in st.session_state:
     st.session_state.nav = "home"
 
 # ---------------- Modern Top Navbar (Wrapped Inside Container) ----------------
-st.markdown('<div class="nav-container">', unsafe_allow_html=True)
+logo_base64 = get_base64_image("images/gv_zambia.png")
+
+st.markdown(
+    f"""
+    <div class="nav-container">
+        <div class="nav-logo">
+            <img src="data:image/png;base64,{logo_base64}" alt="GV Zambia" />
+        </div>
+        <div class="nav-buttons">
+    """,
+    unsafe_allow_html=True
+)
 
 cols = st.columns([2, 1, 1, 1, 1])  # keeps empty space from center-left, buttons align center→right
 for i, (label, key) in enumerate(nav_options.items()):

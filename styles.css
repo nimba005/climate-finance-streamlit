@@ -282,3 +282,23 @@ div.stButton > button:focus {
     gap: 12px;
 }
 
+/* 🆕 Logo styling */
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 20px;
+}
+
+.nav-logo img {
+    height: 40px; /* adjust size */
+    width: auto;
+    margin-right: 20px;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 12px;
+}
