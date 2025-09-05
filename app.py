@@ -96,18 +96,34 @@ nav_map = {
 menu = nav_map.get(st.session_state.nav, "🏠 Home")
 
 
-# ---------------- Header ----------------
-st.markdown(f"""
-<div class="top-header">
-    <div class="header-left">
-        <h2>🌍 Climate Monitoring & Accountability Tool (CMAT)</h2>
-        <p>AI-enabled oversight tool for Zambia’s National Assembly</p>
+# ---------------- Header with Background ----------------
+bg_base64 = get_base64_image("images/national-assembly.jpg")
+
+st.markdown(
+    f"""
+    <div class="header-bg" style="background-image: url('data:image/jpg;base64,{bg_base64}');">
+        <div class="top-header">
+            <div class="header-left">
+                <h2>🌍 Climate Monitoring & Accountability Tool (CMAT)</h2>
+                <p>AI-enabled oversight tool for Zambia’s National Assembly</p>
+            </div>
+            <div class="header-right">
+                {"Logged in as: <strong>" + st.session_state.current_user + "</strong>" if st.session_state.logged_in else "Not logged in"}
+            </div>
+        </div>
+
+        <div class="section intro-text">
+            <h3>Welcome to CMAT</h3>
+            <p>
+                This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
+                <strong>Green Economy and Climate Change Programme</strong>.
+            </p>
+        </div>
     </div>
-    <div class="header-right">
-        {"Logged in as: <strong>" + st.session_state.current_user + "</strong>" if st.session_state.logged_in else "Not logged in"}
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
+
 
 # ---------------- Home ----------------
 if menu == "🏠 Home":

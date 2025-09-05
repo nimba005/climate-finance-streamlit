@@ -302,3 +302,36 @@ div.stButton > button:focus {
     display: flex;
     gap: 12px;
 }
+
+/* Background section for header → intro text */
+.header-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 40px 20px;
+    border-radius: 12px;
+    color: white;
+}
+
+/* Dark overlay for readability */
+.header-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    z-index: 0;
+}
+
+/* Ensure text appears above overlay */
+.header-bg > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* White text inside header-bg */
+.header-bg h2, 
+.header-bg h3, 
+.header-bg p {
+    color: #fff !important;
+}
