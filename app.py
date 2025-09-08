@@ -99,6 +99,11 @@ menu = nav_map.get(st.session_state.nav, "🏠 Home")
 # ---------------- Header with Background ----------------
 bg_base64 = get_base64_image("images/national-assembly.jpg")
 
+user_status = (
+    f"Logged in as: <strong>{st.session_state.current_user}</strong>"
+    if st.session_state.logged_in else "Not logged in"
+)
+
 st.markdown(
     f"""
     <div class="header-bg" style="background-image: url('data:image/jpg;base64,{bg_base64}');">
@@ -108,17 +113,23 @@ st.markdown(
                 <p>AI-enabled oversight tool for Zambia’s National Assembly</p>
             </div>
             <div class="header-right">
-                {"Logged in as: <strong>" + st.session_state.current_user + "</strong>" if st.session_state.logged_in else "Not logged in"}
+                {user_status}
             </div>
         </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-        <div class="section intro-text">
-            <h3>Welcome to CMAT</h3>
-            <p>
-                This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
-                <strong>Green Economy and Climate Change Programme</strong>.
-            </p>
-        </div>
+# 👇 Move intro section into its own st.markdown
+st.markdown(
+    """
+    <div class="section intro-text">
+        <h3>Welcome to CMAT</h3>
+        <p>
+            This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
+            <strong>Green Economy and Climate Change Programme</strong>.
+        </p>
     </div>
     """,
     unsafe_allow_html=True
