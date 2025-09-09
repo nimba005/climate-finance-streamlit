@@ -365,8 +365,12 @@ elif menu == "📑 Upload Document":
             st.json(ai_results)  # pretty-print structured output
             st.plotly_chart(bar_chart(ai_results, "AI Extracted Budget Indicators"), use_container_width=True)
             st.plotly_chart(radar_chart(ai_results, "AI Composite View"), use_container_width=True)
+            # 🔑 Auto-populate survey defaults from AI results
+            st.session_state.survey_defaults = ai_results
+            st.info("📊 Survey defaults updated automatically from AI results ✅")
         else:
             st.info("AI could not extract structured budget figures from this document.")
+
 
         # ---- Climate Programmes Analysis ----
         st.subheader("🌍 Climate Programmes (2023 vs 2024)")
@@ -432,17 +436,25 @@ elif menu == "📝 Survey":
         st.stop()
 
     st.header("📝 CMAT Indicators Survey")
-    st.write("Enter values manually for each indicator. The system will process them like the upload workflow.")
+    st.write("Enter values manually for each indicator. If a document was uploaded, values are pre-filled.")
 
-    # Collect manual inputs
     manual_results = {}
     for category, indicators in CMAT_INDICATORS.items():
         with st.expander(f"📊 {category} Indicators"):
             for ind in indicators:
+                # Fetch default if available (case-insensitive lookup)
+                default_val = 0.0
+                if "survey_defaults" in st.session_state:
+                    for k, v in st.session_state.survey_defaults.items():
+                        if k.lower() == ind.lower():
+                            default_val = v
+                            break
+
                 val = st.number_input(
                     f"{ind}",
                     min_value=0.0,
                     step=1000.0,
+                    value=float(default_val),
                     key=f"survey_{category}_{ind}"
                 )
                 manual_results[ind] = val
@@ -465,12 +477,16 @@ elif menu == "📝 Survey":
 
             percentages = calc_percentages(total_budget, public, adaptation, mitigation)
             st.plotly_chart(
-                bar_percent_chart(["Public", "Adaptation", "Mitigation"], percentages,
-                                  "Share of Total Budget (%)"),
+                bar_percent_chart(
+                    ["Public", "Adaptation", "Mitigation"], 
+                    percentages,
+                    "Share of Total Budget (%)"
+                ),
                 use_container_width=True
             )
     else:
         st.info("Please enter numeric values above to see results.")
+
 
 
 
