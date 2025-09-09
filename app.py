@@ -64,30 +64,29 @@ nav_options = {
 if "nav" not in st.session_state:
     st.session_state.nav = "home"
 
-# ---------------- Modern Top Navbar (Wrapped Inside Container) ----------------
+# ---------------- Modern Top Navbar (Reworked) ----------------
 logo_base64 = get_base64_image("images/gv_zambia.png")
 
-st.markdown(
-    f"""
-    <div class="nav-container">
-        <div class="nav-logo">
-            <img src="data:image/png;base64,{logo_base64}" alt="GV Zambia" />
-        </div>
-        <div class="nav-buttons">
-    """,
-    unsafe_allow_html=True
-)
+# Use a custom div wrapper to target this specific nav bar with CSS
+st.markdown('<div class="nav-bar">', unsafe_allow_html=True)
 
-# Fixed layout: logo space (2) + 5 equal button slots (1 each)
-cols = st.columns([2, 1, 1, 1, 1, 1])  
+# Create columns: a wider one for the logo, and equal ones for the buttons.
+cols = st.columns([2, 1, 1, 1, 1, 1])
 
-# loop through all 5 nav items
+# Render the logo in the first column
+with cols[0]:
+    st.markdown(
+        f'<img src="data:image/png;base64,{logo_base64}" class="nav-logo-img">',
+        unsafe_allow_html=True
+    )
+
+# Render navigation buttons in the remaining columns
 for i, (label, key) in enumerate(nav_options.items()):
-    with cols[i + 1]:  # place buttons starting after logo space
-        if st.button(label, key=f"nav_{key}"):
+    with cols[i + 1]:
+        if st.button(label, key=f"nav_{key}", use_container_width=True):
             st.session_state.nav = key
 
-st.markdown('</div></div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 
 

@@ -103,69 +103,52 @@ div.stButton > button:focus {
 }
 
 /* =========================
-   NAVBAR
+   REWORKED NAVBAR
 ========================= */
-.nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 10px 20px;
-    background: transparent;
-    border-radius: 0 0 12px 12px;
-}
 
-.nav-logo img {
-    height: 42px;
-    width: auto;
-    display: block;
-    object-fit: contain;
-}
-
-.nav-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 18px;
-    background: #1b4332;
-    padding: 8px 16px;
-    border-radius: 8px;
-}
-
-.top-navbar {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    background: #1b4332;
-    padding: 12px 20px;
-    border-radius: 0 0 12px 12px;
+/* Main wrapper for the nav bar from app.py */
+.nav-bar {
+    padding: 8px 0;
     margin-bottom: 25px;
 }
 
-.top-navbar button {
-    background: #2d6a4f;
-    color: #fff;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 8px;
+/* Target the horizontal block created by st.columns */
+.nav-bar [data-testid="stHorizontalBlock"] {
+    align-items: center; /* This is the key to vertically aligning the logo and buttons */
+}
+
+/* Style for the logo image */
+.nav-logo-img {
+    height: 45px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Style for the navigation buttons inside our nav-bar */
+.nav-bar .stButton button {
+    background-color: transparent;
+    color: #1b4332;
     font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease-in-out;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.top-navbar button:hover {
-    background: #40916c;
+.nav-bar .stButton button:hover {
+    background-color: #d8f3dc; /* Light green hover */
+    color: #1b4332;
 }
 
-.top-navbar .active-nav {
-    background: #40916c !important;
+.nav-bar .stButton button:focus {
+    outline: none !important;
+    border: 2px solid #1b4332 !important;
+    background-color: #d8f3dc !important;
+    color: #1b4332 !important;
 }
 
-.top-navbar button:focus {
-    outline: none;
-    background: #1b4332;
-    border: 2px solid #95d5b2;
-}
+
 
 /* =========================
    HEADER BACKGROUND
