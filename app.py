@@ -357,20 +357,53 @@ elif menu == "📑 Upload Document":
         with st.expander("📑 Extracted Text Preview"):
             st.text_area("Extracted Text", text[:3000], height=200)
 
-        # ---- AI-Powered Budget Extraction ----
-        st.subheader("🤖 AI-Extracted Budget Figures")
-        ai_results = ai_extract_budget_info(text)
+        # ---- AI + Keyword-Based Budget Extraction ----
+        st.subheader("🤖 AI + Keyword-Enhanced Budget Figures")
 
-        if ai_results:
-            st.json(ai_results)  # pretty-print structured output
-            st.plotly_chart(bar_chart(ai_results, "AI Extracted Budget Indicators"), use_container_width=True)
-            st.plotly_chart(radar_chart(ai_results, "AI Composite View"), use_container_width=True)
-            # 🔑 Auto-populate survey defaults from AI results
-            st.session_state.survey_defaults = ai_results
-            st.info("📊 Survey defaults updated automatically from AI results ✅")
+        ai_results = ai_extract_budget_info(text) or {}
+        keyword_results = extract_numbers_from_text(
+            text,
+            keywords=[
+                "total public investment in climate initiatives",
+                "percentage of national budget allocated to climate adaptation",
+                "private sector investment mobilized", 
+                "energy", "agriculture", "health", "transport", "water"
+            ]
+        )
+
+        # Merge logic: AI first, then fallback to keyword extraction
+        merged_results = ai_results.copy()
+        for k, v in keyword_results.items():
+            clean_key = k.lower().strip()
+            mapped_key = None
+            if "total" in clean_key:
+                mapped_key = "Total Budget"
+            elif "adaptation" in clean_key:
+                mapped_key = "Adaptation"
+            elif "public" in clean_key:
+                mapped_key = "Public"
+            elif "energy" in clean_key:
+                mapped_key = "Energy"
+            elif "agriculture" in clean_key:
+                mapped_key = "Agriculture"
+            elif "health" in clean_key:
+                mapped_key = "Health"
+            elif "transport" in clean_key:
+                mapped_key = "Transport"
+            elif "water" in clean_key:
+                mapped_key = "Water"
+
+            if mapped_key and mapped_key not in merged_results:
+                merged_results[mapped_key] = v
+
+        if merged_results:
+            st.json(merged_results)
+            st.plotly_chart(bar_chart(merged_results, "Merged Budget Indicators"), use_container_width=True)
+            st.plotly_chart(radar_chart(merged_results, "Merged Composite View"), use_container_width=True)
+            st.session_state.survey_defaults = merged_results
+            st.info("📊 Survey defaults updated automatically from merged AI + keyword extraction ✅")
         else:
-            st.info("AI could not extract structured budget figures from this document.")
-
+            st.warning("⚠️ Could not extract budget figures (AI + fallback both failed).")
 
         # ---- Climate Programmes Analysis ----
         st.subheader("🌍 Climate Programmes (2023 vs 2024)")
@@ -399,35 +432,6 @@ elif menu == "📑 Upload Document":
         else:
             st.info("No agriculture budget data detected.")
 
-        # 🔎 Auto-extract figures
-        st.subheader("📊 Auto-Extracted Key Figures")
-        extracted = extract_numbers_from_text(
-            text,
-            keywords=[
-                "total public investment in climate initiatives",
-                "percentage of national budget allocated to climate adaptation",
-                "private sector investment mobilized", "energy", "agriculture",
-                "health", "transport", "water"
-            ]
-        )
-
-        if extracted:
-            st.write("Extracted Values:", extracted)
-            numeric_results = {}
-            if "total public investment in climate initiatives" in extracted:
-                numeric_results["Total Budget"] = extracted["total public investment in climate initiatives"]
-            if "percentage of national budget allocated to climate adaptation" in extracted:
-                numeric_results["Adaptation"] = extracted["percentage of national budget allocated to climate adaptation"]
-            if "private sector investment mobilized" in extracted:
-                numeric_results["Public"] = extracted["private sector investment mobilized"]
-
-            if numeric_results:
-                st.plotly_chart(bar_chart(numeric_results, "Budget Indicators"), use_container_width=True)
-                st.plotly_chart(radar_chart(numeric_results, "Composite View (Radar)"), use_container_width=True)
-            else:
-                st.info("No numeric results mapped to indicators yet.")
-        else:
-            st.warning("⚠️ No key figures could be extracted. Please check document formatting.")
 
 # ---------------- Survey ----------------
 elif menu == "📝 Survey":
