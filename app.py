@@ -54,7 +54,7 @@ if "current_user" not in st.session_state:
 nav_options = {
     "🏠 Home": "home",
     "ℹ️ About": "about",
-    "📑 Upload Document": "upload",
+    "📑 Upload Doc": "upload",
     "📝 Survey": "survey",
     "🔐 Login": "login"
 }
@@ -94,7 +94,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 nav_map = {
     "home": "🏠 Home",
     "about": "ℹ️ About",
-    "upload": "📑 Upload Document",
+    "upload": "📑 Upload Doc",
     "survey": "📝 Survey",
     "login": "🔐 Login",
 }
@@ -343,7 +343,7 @@ elif menu == "ℹ️ About":
         )
 
 # ---------------- Upload Document ----------------
-elif menu == "📑 Upload Document":
+elif menu == "📑 Upload Doc":
     if not st.session_state.logged_in:
         st.warning("🔐 Please login to access this page.")
         st.stop()
