@@ -112,7 +112,7 @@ div.stButton > button:focus {
     max-width: 1200px;
     margin: 0 auto;
     padding: 10px 20px;
-    background: transparent;   /* make it transparent */
+    background: transparent;
     border-radius: 0 0 12px 12px;
 }
 
@@ -126,8 +126,8 @@ div.stButton > button:focus {
 .nav-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 18px; /* fixed spacing between buttons */
-    background: #1b4332;       /* green background only for buttons */
+    gap: 18px;
+    background: #1b4332;
     padding: 8px 16px;
     border-radius: 8px;
 }
@@ -264,7 +264,7 @@ div.stButton > button:focus {
 ========================= */
 .footer {
     background: #1b4332;
-    color: #fff;
+    color: #fff !important;
     padding: 40px 20px 20px;
     margin-top: 50px;
     border-radius: 12px 12px 0 0;
@@ -295,7 +295,8 @@ div.stButton > button:focus {
 .footer-section a {
     font-size: 0.9em;
     line-height: 1.6;
-    color: #eee;
+    color: #fff !important;
+    font-weight: 600;
     text-decoration: none;
 }
 
@@ -336,7 +337,8 @@ div.stButton > button:focus {
     padding-top: 15px;
     text-align: center;
     font-size: 0.85em;
-    color: #ccc;
+    color: #fff !important;
+    font-weight: 600;
 }
 
 /* =========================
@@ -353,7 +355,8 @@ a:hover {
     color: #1b4332;
     text-decoration: underline;
 }
-/* Force About page text to be dark */
+
+/* Force About page text to be dark, but not footer */
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li,
 [data-testid="stMarkdownContainer"] h1,
@@ -363,6 +366,19 @@ a:hover {
 [data-testid="stMarkdownContainer"] h5,
 [data-testid="stMarkdownContainer"] h6 {
     color: #000 !important;
+}
+
+/* ✅ Override for footer markdown text */
+.footer p,
+.footer li,
+.footer h1,
+.footer h2,
+.footer h3,
+.footer h4,
+.footer h5,
+.footer h6,
+.footer a {
+    color: #fff !important;
 }
 
 /* nav buttons (streamlit injected) */
@@ -377,18 +393,15 @@ div.stButton > button[kind="secondary"] {
     transition: background 0.2s ease-in-out !important;
 }
 
-/* hover */
 div.stButton > button[kind="secondary"]:hover {
     background: #40916c !important;
 }
 
-/* active nav highlight */
 div.stButton > button.active-nav {
     background: #40916c !important;
     border: 2px solid #95d5b2 !important;
 }
 
-/* focus (keyboard/tab) */
 div.stButton > button:focus {
     outline: none !important;
     background: #1b4332 !important;
