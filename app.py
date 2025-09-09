@@ -50,13 +50,14 @@ if "logged_in" not in st.session_state:
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
 
-# ---------------- Top Navigation (Custom Green Bar) ----------------
 nav_options = {
     "🏠 Home": "home",
+    "ℹ️ About": "about",
     "📑 Upload Document": "upload",
-    "📝 Indicators Survey": "survey",
+    "📝 Survey": "survey",
     "🔐 Login": "login"
 }
+
 
 # Set default nav
 if "nav" not in st.session_state:
@@ -76,9 +77,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-cols = st.columns([2, 1, 1, 1, 1])  # keeps empty space from center-left, buttons align center→right
+# Fixed layout: logo space (2) + 5 equal button slots (1 each)
+cols = st.columns([2, 1, 1, 1, 1, 1])  
+
+# loop through all 5 nav items
 for i, (label, key) in enumerate(nav_options.items()):
-    with cols[i+1]:
+    with cols[i + 1]:  # place buttons starting after logo space
         if st.button(label, key=f"nav_{key}"):
             st.session_state.nav = key
 
@@ -86,19 +90,21 @@ st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 
-# Map session state nav to menu (so your existing logic still works)
+# Map session state nav to menu (keeps consistency with nav_options)
 nav_map = {
     "home": "🏠 Home",
+    "about": "ℹ️ About",
     "upload": "📑 Upload Document",
-    "survey": "📝 Indicators Survey",
+    "survey": "📝 Survey",
     "login": "🔐 Login",
 }
+
+
+
 menu = nav_map.get(st.session_state.nav, "🏠 Home")
 
 
-# ---------------- Header with Background ----------------
-bg_base64 = get_base64_image("images/national-assembly.jpg")
-
+# ---------------- Header (No Background) ----------------
 user_status = (
     f"Logged in as: <strong>{st.session_state.current_user}</strong>"
     if st.session_state.logged_in else "Not logged in"
@@ -106,30 +112,14 @@ user_status = (
 
 st.markdown(
     f"""
-    <div class="header-bg" style="background-image: url('data:image/jpg;base64,{bg_base64}');">
-        <div class="top-header">
-            <div class="header-left">
-                <h2>🌍 Climate Monitoring & Accountability Tool (CMAT)</h2>
-                <p>AI-enabled oversight tool for Zambia’s National Assembly</p>
-            </div>
-            <div class="header-right">
-                {user_status}
-            </div>
+    <div class="top-header" style="padding: 20px; background-color: #f9f9f9; border-bottom: 1px solid #ddd;">
+        <div class="header-left">
+            <h2>🌍 Climate Monitoring & Accountability Tool (CMAT)</h2>
+            <p>AI-enabled oversight tool for Zambia’s National Assembly</p>
         </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# 👇 Move intro section into its own st.markdown
-st.markdown(
-    """
-    <div class="section intro-text">
-        <h3>Welcome to CMAT</h3>
-        <p>
-            This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
-            <strong>Green Economy and Climate Change Programme</strong>.
-        </p>
+        <div class="header-right" style="font-size:14px; color:#333;">
+            {user_status}
+        </div>
     </div>
     """,
     unsafe_allow_html=True
@@ -138,27 +128,159 @@ st.markdown(
 
 # ---------------- Home ----------------
 if menu == "🏠 Home":
-    st.markdown('<div class="section">', unsafe_allow_html=True)
-    st.subheader("Welcome to CMAT")
-    st.markdown("""
-        This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
-        **Green Economy and Climate Change Programme**.
-    """)
-    st.markdown('<div class="section">', unsafe_allow_html=True)
+    # 🏠 Intro Section
+    st.markdown(
+        """
+        <div class="section intro-text">
+            <h3>Welcome to CMAT</h3>
+            <p>
+                This tool supports parliamentary oversight of climate action by monitoring key indicators under the 
+                <strong>Green Economy and Climate Change Programme</strong>.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# ---------------- About ----------------
+elif menu == "ℹ️ About":
+    st.header("ℹ️ About CMAT")
+    st.markdown(
+        """
+        The **Climate Monitoring & Accountability Tool (CMAT)** is an AI-enabled platform 
+        developed by the **National Assembly of Zambia (NAZ)** in collaboration with **AGNES**.  
+        Its goal is to strengthen **parliamentary oversight** of climate action by tracking 
+        budgets, programmes, and performance against Zambia’s climate goals.  
+
+        ### 📜 Background & Context
+        - Developed in line with **NAZ Standing Orders (2024)** and the **National Planning and Budgeting Act No. 1 of 2020**.  
+        - Focuses on oversight of the **Ministry of Green Economy and Environment**, which leads Zambia’s climate policy.  
+        - Supports alignment with **international commitments** (Paris Agreement, NDCs).  
+
+        ### 🎯 Objectives
+        1. Track climate-related laws, budgets, and strategies.  
+        2. Strengthen transparency in climate finance.  
+        3. Promote accountability in project implementation.  
+        4. Enhance public engagement and awareness.  
+        """
+    )
+
+    st.subheader("📊 Indicators for CMAT")
+    st.markdown(
+        """
+        The CMAT uses indicators to track Zambia’s climate governance, 
+        budget allocations, and policy outcomes. Indicators fall under 
+        these categories:
+        """
+    )
+
+    categories = {
+        "Legislative": [
+            "Number of Climate-Related Laws Enacted",
+            "Quality of Climate Legislation",
+            "Timeliness of Law Implementation"
+        ],
+        "Financial": [
+            "Total Public Investment in Climate Initiatives",
+            "Budget % Allocated to Climate Adaptation",
+            "Private Sector Investment Mobilized"
+        ],
+        "Policy & Governance": [
+            "Green Growth Guidelines",
+            "Climate Coordination",
+            "Public Engagement"
+        ],
+        "Capacity Building": [
+            "Training Programmes Funded",
+            "Awareness Campaigns Implemented"
+        ],
+        "Implementation": [
+            "% of Budget Utilised",
+            "Project Completion Rates",
+            "Fund Disbursement Timeliness"
+        ],
+        "International Commitments": [
+            "Alignment with Paris Agreement",
+            "Progress Towards NDCs"
+        ]
+    }
+
+    for category, inds in categories.items():
+        with st.expander(f"📌 {category} Indicators"):
+            for ind in inds:
+                st.markdown(f"- {ind}")
+
+    # 📂 Reports Section
+    st.markdown(
+        """
+        <div class="section">
+            <h3>📂 Reports & Resources</h3>
+            <p>Here you will find key documents, data, and reports generated through CMAT.</p>
+
+            ### 📑 Available Resources
+            - 📘 National Climate Indicators Report (2025) *(Coming Soon)*
+            - 📗 Annual Budget Oversight Report *(Draft in progress)*
+            - 📄 Public Awareness Briefs *(2025)*
+
+            ### 📥 Downloads
+            *Currently under development – reports will be made available here.*
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # 🎞 Project images for slideshow
-    projects = [
-        {"title": "Chisamba Solar Power Plant (100 MW)", "desc": "Commissioned June 2025; helps diversify Zambia’s energy mix away from hydropower.", "img": "images/chisamba.jpg"},
-        {"title": "Itimpi Solar Power Station (60 MW)", "desc": "Kitwe-based solar farm addressing electricity shortages, commissioned April 2024.", "img": "images/itimpi.jpg"},
-        {"title": "Zambia Riverside Solar Power Station (34 MW)", "desc": "Expanded solar farm in Kitwe operational since February 2023.", "img": "images/riverside.jpg"},
-        {"title": "Growing Greener Project (Simalaha Conservancy)", "desc": "Community-led project building resilience, combating desertification and boosting biodiversity.", "img": "images/greener.jpg"},
-        {"title": "Strengthening Climate Resilience in the Barotse Sub-basin", "desc": "CIF/World Bank-supported effort (2013–2022) to enhance local adaptation capacity.", "img": "images/barotse.jpg"},
-        {"title": "Early Warning Systems Project", "desc": "UNDP-GEF initiative building Zambia’s hydro-meteorological monitoring infrastructure.", "img": "images/earlywarning.jpg"},
-        {"title": "National Adaptation Programme of Action (NAPA)", "desc": "Targeted adaptation interventions prioritizing vulnerable sectors.", "img": "images/napa.jpg"},
-        {"title": "NDC Implementation Framework", "desc": "₮17.2 B Blueprint (2023–2030) aligning mitigation/adaptation with national development goals.", "img": "images/ndc.jpg"},
-    ]
+    st.markdown(
+        """
+        <div class="section">
+            <h3>🏷 Featured National Climate Projects</h3>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.subheader("🏷 Featured National Climate Projects")
+    projects = [
+        {
+            "title": "Chisamba Solar Power Plant (100 MW)",
+            "desc": "Commissioned June 2025; helps diversify Zambia’s energy mix away from hydropower.",
+            "img": "images/chisamba.jpg"
+        },
+        {
+            "title": "Itimpi Solar Power Station (60 MW)",
+            "desc": "Kitwe-based solar farm addressing electricity shortages, commissioned April 2024.",
+            "img": "images/itimpi.jpg"
+        },
+        {
+            "title": "Zambia Riverside Solar Power Station (34 MW)",
+            "desc": "Expanded solar farm in Kitwe operational since February 2023.",
+            "img": "images/riverside.jpg"
+        },
+        {
+            "title": "Growing Greener Project (Simalaha Conservancy)",
+            "desc": "Community-led project building resilience, combating desertification and boosting biodiversity.",
+            "img": "images/greener.jpg"
+        },
+        {
+            "title": "Strengthening Climate Resilience in the Barotse Sub-basin",
+            "desc": "CIF/World Bank-supported effort (2013–2022) to enhance local adaptation capacity.",
+            "img": "images/barotse.jpg"
+        },
+        {
+            "title": "Early Warning Systems Project",
+            "desc": "UNDP-GEF initiative building Zambia’s hydro-meteorological monitoring infrastructure.",
+            "img": "images/earlywarning.jpg"
+        },
+        {
+            "title": "National Adaptation Programme of Action (NAPA)",
+            "desc": "Targeted adaptation interventions prioritizing vulnerable sectors.",
+            "img": "images/napa.jpg"
+        },
+        {
+            "title": "NDC Implementation Framework",
+            "desc": "₮17.2 B Blueprint (2023–2030) aligning mitigation/adaptation with national development goals.",
+            "img": "images/ndc.jpg"
+        }
+    ]
 
     # Slideshow state
     if "slide_index" not in st.session_state:
@@ -193,11 +315,10 @@ if menu == "🏠 Home":
         st.markdown(
             f"""
             <img src="data:image/png;base64,{get_base64_image(project['img'])}" 
-                class="project-img" alt="{project['title']}"/>
+                 class="project-img" alt="{project['title']}"/>
             """,
             unsafe_allow_html=True
-    )
-
+        )
         st.markdown(
             f"""
             <div class="project-text">
@@ -208,15 +329,18 @@ if menu == "🏠 Home":
             unsafe_allow_html=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
-        
+
         # Dot indicators
         dots = ""
         for i in range(len(projects)):
             if i == st.session_state.slide_index:
-                dots += f"<span style='font-size:22px; color:#007BFF;'>●</span> "
+                dots += "<span style='font-size:22px; color:#007BFF;'>●</span> "
             else:
-                dots += f"<span style='font-size:18px; color:gray;'>○</span> "
-        st.markdown(f"<div style='text-align:center; margin-top:10px;'>{dots}</div>", unsafe_allow_html=True)
+                dots += "<span style='font-size:18px; color:gray;'>○</span> "
+        st.markdown(
+            f"<div style='text-align:center; margin-top:10px;'>{dots}</div>",
+            unsafe_allow_html=True
+        )
 
 # ---------------- Upload Document ----------------
 elif menu == "📑 Upload Document":
@@ -301,30 +425,54 @@ elif menu == "📑 Upload Document":
         else:
             st.warning("⚠️ No key figures could be extracted. Please check document formatting.")
 
-# ---------------- Indicators Survey ----------------
-elif menu == "📝 Indicators Survey":
+# ---------------- Survey ----------------
+elif menu == "📝 Survey":
     if not st.session_state.logged_in:
         st.warning("🔐 Please login to access this page.")
         st.stop()
 
-    st.header("📝 CMAT Indicators Input")
-    results = {}
+    st.header("📝 CMAT Indicators Survey")
+    st.write("Enter values manually for each indicator. The system will process them like the upload workflow.")
+
+    # Collect manual inputs
+    manual_results = {}
     for category, indicators in CMAT_INDICATORS.items():
         with st.expander(f"📊 {category} Indicators"):
             for ind in indicators:
-                val = st.text_input(ind, key=f"{category}_{ind}")
-                try:
-                    results[ind] = float(val) if val else 0
-                except:
-                    results[ind] = val
+                val = st.number_input(
+                    f"{ind}",
+                    min_value=0.0,
+                    step=1000.0,
+                    key=f"survey_{category}_{ind}"
+                )
+                manual_results[ind] = val
 
-    st.subheader("📊 Visualizations")
-    numeric_results = {k: v for k, v in results.items() if isinstance(v, (int, float))}
+    # Process entered numbers
+    st.subheader("📊 Survey Results")
+    numeric_results = {k: v for k, v in manual_results.items() if isinstance(v, (int, float)) and v > 0}
+
     if numeric_results:
-        st.plotly_chart(bar_chart(numeric_results, "Indicator Values"), use_container_width=True)
-        st.plotly_chart(radar_chart(numeric_results, "Composite View (Radar)"), use_container_width=True)
+        st.success("✅ Indicators recorded successfully")
+        st.plotly_chart(bar_chart(numeric_results, "Survey Budget Indicators"), use_container_width=True)
+        st.plotly_chart(radar_chart(numeric_results, "Survey Composite View"), use_container_width=True)
+
+        # Extra: calculate percentages if "Total Budget" is present
+        if "Total Budget" in numeric_results:
+            total_budget = numeric_results["Total Budget"]
+            public = numeric_results.get("Public", 0)
+            adaptation = numeric_results.get("Adaptation", 0)
+            mitigation = numeric_results.get("Mitigation", 0)
+
+            percentages = calc_percentages(total_budget, public, adaptation, mitigation)
+            st.plotly_chart(
+                bar_percent_chart(["Public", "Adaptation", "Mitigation"], percentages,
+                                  "Share of Total Budget (%)"),
+                use_container_width=True
+            )
     else:
-        st.info("Enter numeric values to generate visualizations.")
+        st.info("Please enter numeric values above to see results.")
+
+
 
 # ---------------- Login ----------------
 elif menu == "🔐 Login":

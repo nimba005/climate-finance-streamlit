@@ -1,67 +1,84 @@
-/* Main background */
+/* =========================
+   GLOBAL STYLES
+========================= */
 .stApp {
     background-color: #f9fafa;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Sidebar styling */
+h1, h2, h3, h4 {
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 600;
+    color: #1b4332;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
 section[data-testid="stSidebar"] {
     background-color: #1b4332;
     color: white;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centers vertically */
-    align-items: center;     /* Centers horizontally */
-    height: 100vh;           /* Full height */
+    justify-content: center; 
+    align-items: center;     
+    height: 100vh;
 }
 
-/* Sidebar radio buttons container */
 section[data-testid="stSidebar"] .stRadio {
-    width: 100%; /* Make it fill sidebar width */
+    width: 100%;
 }
 
-/* Radio button labels */
 section[data-testid="stSidebar"] .st-radio label {
     color: white !important;
     font-weight: 600;
-    font-size: 1.6em; /* Larger text */
-    padding: 20px 10px; /* More spacing */
+    font-size: 1.6em;
+    padding: 20px 10px;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center icons + text */
+    justify-content: center;
 }
 
-/* Make icons larger */
 section[data-testid="stSidebar"] .st-radio label span {
     font-size: 2em;    
     margin-right: 12px;
 }
 
-/* Titles */
-h1, h2, h3 {
-    color: #1b4332;
-}
-
-/* Buttons */
+/* =========================
+   BUTTONS
+========================= */
 div.stButton > button {
-    background-color: #2d6a4f;
-    color: white;
-    font-weight: 600;
-    border-radius: 10px;
-    padding: 0.6em 1.2em;
-    border: none;
-}
-div.stButton > button:hover {
-    background-color: #40916c;
-    color: white;
+    background: #2d6a4f !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 18px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease-in-out !important;
 }
 
-/* Inputs */
-.stTextInput input, .stTextArea textarea {
+div.stButton > button:hover {
+    background: #40916c !important;
+}
+
+div.stButton > button:focus {
+    outline: none !important;
+    background: #1b4332 !important;
+    border: 2px solid #95d5b2 !important;
+}
+
+/* =========================
+   INPUTS
+========================= */
+.stTextInput input, 
+.stTextArea textarea {
     border-radius: 8px;
 }
 
-/* Top Header */
+/* =========================
+   TOP HEADER
+========================= */
 .top-header {
     display: flex;
     justify-content: space-between;
@@ -70,33 +87,143 @@ div.stButton > button:hover {
     padding: 10px 20px;
     margin-bottom: 20px;
 }
+
 .top-header h2 {
     margin: 0;
 }
+
 .top-header p {
     margin: 2px 0 0 0;
     font-size: 0.9em;
     color: #555;
 }
+
 .top-header .header-right {
     font-size: 0.9em;
 }
 
-/* Footer styling */
-.footer {
-    text-align: center;
-    padding: 15px;
-    color: #555;
-}
-.footer a {
-    color: #2d6a4f;
-    text-decoration: none;
-}
-.footer a:hover {
-    text-decoration: underline;
+/* =========================
+   NAVBAR
+========================= */
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background: transparent;   /* make it transparent */
+    border-radius: 0 0 12px 12px;
 }
 
-/* 🆕 Project card container */
+.nav-logo img {
+    height: 42px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 18px; /* fixed spacing between buttons */
+    background: #1b4332;       /* green background only for buttons */
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.top-navbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    background: #1b4332;
+    padding: 12px 20px;
+    border-radius: 0 0 12px 12px;
+    margin-bottom: 25px;
+}
+
+.top-navbar button {
+    background: #2d6a4f;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+.top-navbar button:hover {
+    background: #40916c;
+}
+
+.top-navbar .active-nav {
+    background: #40916c !important;
+}
+
+.top-navbar button:focus {
+    outline: none;
+    background: #1b4332;
+    border: 2px solid #95d5b2;
+}
+
+/* =========================
+   HEADER BACKGROUND
+========================= */
+.header-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 40px 20px;
+    border-radius: 12px;
+    color: white;
+    position: relative;
+}
+
+.header-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    z-index: 0;
+}
+
+.header-bg > * {
+    position: relative;
+    z-index: 1;
+}
+
+.header-bg h2, 
+.header-bg h3, 
+.header-bg p {
+    color: #fff !important;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+.section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 25px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    color: #000 !important;
+}
+
+.section h1, 
+.section h2, 
+.section h3, 
+.section h4, 
+.section p, 
+.section li {
+    color: #000 !important;
+}
+
+/* =========================
+   PROJECT CARDS
+========================= */
 .project-card {
     text-align: center;
     background: white;
@@ -106,39 +233,42 @@ div.stButton > button:hover {
     margin-top: 10px;
     transition: transform 0.2s ease-in-out;
 }
+
 .project-card:hover {
     transform: translateY(-4px);
 }
 
-/* 🆕 Consistent image size */
 .project-img {
     width: 100%;
-    max-width: 350px; /* Controls max size */
-    height: 160px;    /* Fixed height */
-    object-fit: cover; /* Crop neatly without distortion */
+    max-width: 350px;
+    height: 160px;
+    object-fit: cover;
     border-radius: 12px;
     margin-bottom: 10px;
 }
 
-/* 🆕 Text under images */
 .project-text h4 {
     margin: 5px 0;
     font-size: 1.1em;
     color: #1b4332;
 }
+
 .project-text p {
     font-size: 0.9em;
     color: #444;
     line-height: 1.4;
 }
 
-/* Footer */
+/* =========================
+   FOOTER
+========================= */
 .footer {
     background: #1b4332;
     color: #fff;
     padding: 40px 20px 20px;
     margin-top: 50px;
     border-radius: 12px 12px 0 0;
+    text-align: center;
 }
 
 .footer-container {
@@ -183,7 +313,6 @@ div.stButton > button:hover {
     margin-bottom: 8px;
 }
 
-/* Social icons */
 .social-icons {
     margin-top: 10px;
 }
@@ -201,7 +330,6 @@ div.stButton > button:hover {
     filter: brightness(0.8) invert(1);
 }
 
-/* Bottom copyright */
 .footer-bottom {
     border-top: 1px solid rgba(255,255,255,0.2);
     margin-top: 30px;
@@ -211,127 +339,58 @@ div.stButton > button:hover {
     color: #ccc;
 }
 
-/* 🆕 Top Navbar */
-.top-navbar {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    background: #1b4332;
-    padding: 12px 20px;
-    border-radius: 0 0 12px 12px;
-    margin-bottom: 25px;
+/* =========================
+   LINKS
+========================= */
+a {
+    color: #2d6a4f;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out, text-decoration 0.2s ease-in-out;
 }
 
-.top-navbar button {
-    background: #2d6a4f;
-    color: #fff;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease-in-out;
+a:hover {
+    color: #1b4332;
+    text-decoration: underline;
+}
+/* Force About page text to be dark */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stMarkdownContainer"] h4,
+[data-testid="stMarkdownContainer"] h5,
+[data-testid="stMarkdownContainer"] h6 {
+    color: #000 !important;
 }
 
-.top-navbar button:hover {
-    background: #40916c;
-}
-
-.top-navbar .active-nav {
-    background: #40916c !important;
-}
-
-.top-navbar button:focus {
-    outline: none;
-    background: #1b4332;
-    border: 2px solid #95d5b2;
-}
-/* 🆕 Top Navbar */
-div.stButton > button {
+/* nav buttons (streamlit injected) */
+div.stButton > button[kind="secondary"] {
     background: #2d6a4f !important;
     color: #fff !important;
     border: none !important;
-    padding: 8px 18px !important;
+    padding: 8px 20px !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
     cursor: pointer !important;
     transition: background 0.2s ease-in-out !important;
 }
 
-div.stButton > button:hover {
+/* hover */
+div.stButton > button[kind="secondary"]:hover {
     background: #40916c !important;
 }
 
+/* active nav highlight */
+div.stButton > button.active-nav {
+    background: #40916c !important;
+    border: 2px solid #95d5b2 !important;
+}
+
+/* focus (keyboard/tab) */
 div.stButton > button:focus {
     outline: none !important;
     background: #1b4332 !important;
     border: 2px solid #95d5b2 !important;
-}
-/* 🆕 Navbar container */
-.nav-container {
-    display: flex;
-    justify-content: flex-end; /* align buttons right */
-    margin: 0 auto;
-    max-width: 1200px; /* keep consistent with footer */
-    padding: 10px 20px;
-}
-
-/* Make nav buttons inline */
-.nav-container [data-testid="stHorizontalBlock"] {
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-/* 🆕 Logo styling */
-.nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 10px 20px;
-}
-
-.nav-logo img {
-    height: 40px; /* adjust size */
-    width: auto;
-    margin-right: 20px;
-}
-
-.nav-buttons {
-    display: flex;
-    gap: 12px;
-}
-
-/* Background section for header → intro text */
-.header-bg {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 40px 20px;
-    border-radius: 12px;
-    color: white;
-}
-
-/* Dark overlay for readability */
-.header-bg::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    border-radius: 12px;
-    z-index: 0;
-}
-
-/* Ensure text appears above overlay */
-.header-bg > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* White text inside header-bg */
-.header-bg h2, 
-.header-bg h3, 
-.header-bg p {
-    color: #fff !important;
 }
