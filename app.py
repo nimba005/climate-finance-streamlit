@@ -2,6 +2,7 @@
 import streamlit as st
 import os, json
 import base64
+from backend import extract_combined_budget_info
 from streamlit_autorefresh import st_autorefresh
 from backend import (
     CMAT_INDICATORS,
@@ -357,44 +358,9 @@ elif menu == "📑 Upload Document":
         with st.expander("📑 Extracted Text Preview"):
             st.text_area("Extracted Text", text[:3000], height=200)
 
-        # ---- AI + Keyword-Based Budget Extraction ----
+        # ---- AI + Keyword-Based Budget Extraction (via backend) ----
         st.subheader("🤖 AI + Keyword-Enhanced Budget Figures")
-
-        ai_results = ai_extract_budget_info(text) or {}
-        keyword_results = extract_numbers_from_text(
-            text,
-            keywords=[
-                "total public investment in climate initiatives",
-                "percentage of national budget allocated to climate adaptation",
-                "private sector investment mobilized", 
-                "energy", "agriculture", "health", "transport", "water"
-            ]
-        )
-
-        # Merge logic: AI first, then fallback to keyword extraction
-        merged_results = ai_results.copy()
-        for k, v in keyword_results.items():
-            clean_key = k.lower().strip()
-            mapped_key = None
-            if "total" in clean_key:
-                mapped_key = "Total Budget"
-            elif "adaptation" in clean_key:
-                mapped_key = "Adaptation"
-            elif "public" in clean_key:
-                mapped_key = "Public"
-            elif "energy" in clean_key:
-                mapped_key = "Energy"
-            elif "agriculture" in clean_key:
-                mapped_key = "Agriculture"
-            elif "health" in clean_key:
-                mapped_key = "Health"
-            elif "transport" in clean_key:
-                mapped_key = "Transport"
-            elif "water" in clean_key:
-                mapped_key = "Water"
-
-            if mapped_key and mapped_key not in merged_results:
-                merged_results[mapped_key] = v
+        merged_results = extract_combined_budget_info(text)
 
         if merged_results:
             st.json(merged_results)
@@ -431,7 +397,6 @@ elif menu == "📑 Upload Document":
             st.plotly_chart(agriculture_bar_chart(df, totals, year=2024), use_container_width=True)
         else:
             st.info("No agriculture budget data detected.")
-
 
 # ---------------- Survey ----------------
 elif menu == "📝 Survey":

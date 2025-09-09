@@ -44,7 +44,7 @@ def get_client():
         print(f"⚠️ Switched to backup key #{current_key_index+1}")
         return client
 
-
+# ---- AI Extraction ----
 def ai_extract_budget_info(text: str):
     """
     Uses GPT to analyze PDF text and extract structured budget data.
@@ -52,26 +52,67 @@ def ai_extract_budget_info(text: str):
     prompt = f"""
     You are a financial data analyst. Extract budget allocations for climate-related programmes
     (Energy, Agriculture, Health, Transport, Water, and total budget).
-    Return results as valid JSON with numeric values only.
-    
-    Text:
-    {text[:5000]}  # send only first 5k chars to avoid token overflow
+    Return results as a clean JSON object with numeric values only.
+    Text: {text[:3000]}
     """
-
-   
     try:
-        c = get_client()
-        response = c.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "system", "content": "You are a financial data analyst."},
+                      {"role": "user", "content": prompt}],
             temperature=0
         )
-        
-        content = response.choices[0].message.content
-        return json.loads(content)  # Expect JSON output
+        content = response.choices[0].message["content"]
+        return json.loads(content)
     except Exception as e:
-        print("AI parsing error:", e)
+        print("AI extraction failed:", e)
         return {}
+
+# ---- AI + Keyword Combined Extraction ----
+def extract_combined_budget_info(text: str):
+    """
+    Runs AI + keyword extraction and merges results.
+    AI takes priority; keywords fill missing values.
+    Returns a clean dictionary.
+    """
+    ai_results = ai_extract_budget_info(text) or {}
+    keyword_results = extract_numbers_from_text(
+        text,
+        keywords=[
+            "total public investment in climate initiatives",
+            "percentage of national budget allocated to climate adaptation",
+            "private sector investment mobilized", 
+            "energy", "agriculture", "health", "transport", "water"
+        ]
+    )
+
+    # Start with AI results
+    merged = ai_results.copy()
+
+    # Map keyword keys to clean indicator names
+    mapping = {
+        "total": "Total Budget",
+        "adaptation": "Adaptation",
+        "public": "Public",
+        "energy": "Energy",
+        "agriculture": "Agriculture",
+        "health": "Health",
+        "transport": "Transport",
+        "water": "Water"
+    }
+
+    for k, v in keyword_results.items():
+        clean_key = k.lower().strip()
+        mapped_key = None
+        for kw, label in mapping.items():
+            if kw in clean_key:
+                mapped_key = label
+                break
+        if mapped_key and mapped_key not in merged:
+            merged[mapped_key] = v
+
+    return merged
+
 
 # ---- PDF Extraction ----
 def extract_text_from_pdf(uploaded_file, max_pages=None):
