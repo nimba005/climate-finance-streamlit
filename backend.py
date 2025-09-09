@@ -69,6 +69,27 @@ def ai_extract_budget_info(text: str):
         return {}
 
 # ---- AI + Keyword Combined Extraction ----
+def clean_numeric_value(val):
+    """
+    Cleans budget values (strings or numbers) into floats.
+    Handles %, commas, and currency symbols safely.
+    """
+    if val is None:
+        return None
+
+    if isinstance(val, (int, float)):
+        return float(val)
+
+    if isinstance(val, str):
+        # Remove currency symbols, commas, and percentage signs
+        cleaned = re.sub(r"[^\d\.\-]", "", val)
+        try:
+            return float(cleaned)
+        except ValueError:
+            return None
+
+    return None
+
 def extract_combined_budget_info(text: str):
     """
     Runs AI + keyword extraction and merges results.
@@ -110,6 +131,9 @@ def extract_combined_budget_info(text: str):
                 break
         if mapped_key and mapped_key not in merged:
             merged[mapped_key] = v
+
+    # ✅ Clean all values before returning
+    merged = {k: clean_numeric_value(v) for k, v in merged.items() if v is not None}
 
     return merged
 
