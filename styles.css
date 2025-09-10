@@ -128,12 +128,13 @@ div.stButton > button:focus {
 /* Style for the navigation buttons inside our nav-bar */
 .nav-bar .stButton button {
     background-color: transparent;
-    color: #1b4332;
+    color: #ffffff;
     font-weight: 600;
     border: 2px solid transparent;
     border-radius: 8px;
     padding: 8px 12px;
     transition: background-color 0.3s, color 0.3s;
+    font-size: 16px;
 }
 
 .nav-bar .stButton button:hover {
@@ -146,6 +147,11 @@ div.stButton > button:focus {
     border: 2px solid #1b4332 !important;
     background-color: #d8f3dc !important;
     color: #1b4332 !important;
+}
+.nav-bar .stButton button.active-nav { /* This class might need to be added dynamically in app.py if not already present */
+    color: #ffffff; /* White text for active button */
+    font-weight: bold; /* Ensure it's bold */
+    border-color: #95d5b2; /* Highlight border */
 }
 
 
