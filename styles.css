@@ -154,7 +154,37 @@ div.stButton > button:focus {
     border-color: #95d5b2; /* Highlight border */
 }
 
+/* =========================
+   STICKY NAVBAR
+========================= */
 
+/* Make the nav-bar sticky */
+.sticky-nav {
+    position: sticky;
+    top: 0; /* Stick to the top of the viewport */
+    z-index: 1000; /* Ensure it stays above other content */
+    background-color: #ffffff; /* Or your desired background color */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: Add a subtle shadow */
+}
+
+/* Adjusting the container for the columns to ensure it behaves well with sticky positioning */
+.nav-bar [data-testid="stHorizontalBlock"] {
+    align-items: center;
+    /* Add padding to the top to prevent content from being hidden behind the sticky nav */
+    padding-top: 8px; /* Adjust as needed */
+    padding-bottom: 8px; /* Adjust as needed */
+}
+
+/* Ensure the main app content has padding at the top to avoid being covered by the sticky nav */
+/* You might need to adjust this based on the exact height of your nav bar */
+.stApp {
+    padding-top: 70px; /* Adjust this value based on your nav bar's height */
+}
+
+/* You may also need to add top padding to the specific sections if they appear *under* the sticky nav */
+.section {
+    margin-top: 25px; /* This might need adjustment, or you can target the first element after the nav */
+}
 
 /* =========================
    HEADER BACKGROUND

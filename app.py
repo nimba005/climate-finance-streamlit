@@ -68,7 +68,7 @@ if "nav" not in st.session_state:
 logo_base64 = get_base64_image("images/gv_zambia.png")
 
 # Use a custom div wrapper to target this specific nav bar with CSS
-st.markdown('<div class="nav-bar">', unsafe_allow_html=True)
+st.markdown('<div class="nav-bar sticky-nav">', unsafe_allow_html=True)
 
 # Create columns: a wider one for the logo, and equal ones for the buttons.
 cols = st.columns([2, 1, 1, 1, 1, 1])
