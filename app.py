@@ -490,32 +490,55 @@ elif menu == "🔐 Login":
                     st.success(f"✅ Account created for {u}. Please login.")
 
 # ---------------- Footer ----------------
+# We inject a custom CSS class to wrap the footer and apply styles
 st.markdown("""
 <div class="footer">
     <div class="footer-container">
-        <div class="footer-section">
-            <h4>About CMAT</h4>
-            <p>🌍 Climate Monitoring & Accountability Tool (CMAT) supports Zambia’s climate action oversight by tracking projects, budgets, and impact.</p>
+""", unsafe_allow_html=True)
+
+# Use Streamlit columns to structure the footer content
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("""
+        <h4>About CMAT</h4>
+        <p>🌍 Climate Monitoring & Accountability Tool (CMAT) supports Zambia’s climate action oversight by tracking projects, budgets, and impact.</p>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("<h4>Quick Links</h4>", unsafe_allow_html=True)
+    
+    # Use st.button to trigger navigation. Each button updates the session state.
+    if st.button("Home", key="footer_home", use_container_width=True):
+        st.session_state.nav = "home"
+        st.rerun()
+        
+    if st.button("About", key="footer_about", use_container_width=True):
+        st.session_state.nav = "about"
+        st.rerun()
+        
+    if st.button("Upload Document", key="footer_upload", use_container_width=True):
+        st.session_state.nav = "upload"
+        st.rerun()
+        
+    if st.button("Login", key="footer_login", use_container_width=True):
+        st.session_state.nav = "login"
+        st.rerun()
+
+with col3:
+    st.markdown("""
+        <h4>Contact</h4>
+        <p>Email: info@parliament.gov.zm</p>
+        <p>📍 Parliament road, Lusaka</p>
+        <div class="social-icons">
+            <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" width="20"/></a>
+            <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" width="20"/></a>
+            <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="LinkedIn" width="20"/></a>
         </div>
-        <div class="footer-section">
-            <h4>Quick Links</h4>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Projects</a></li>
-                <li><a href="#">Reports</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </div>
-        <div class="footer-section">
-            <h4>Contact</h4>
-            <p>Email: info@agneafrica.org</p>
-            <p>📍 Blue Violet Plaza, Kilimani</p>
-            <div class="social-icons">
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" width="20"/></a>
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" width="20"/></a>
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="LinkedIn" width="20"/></a>
-            </div>
-        </div>
+    """, unsafe_allow_html=True)
+
+# Close the footer containers and add the bottom bar
+st.markdown("""
     </div>
     <div class="footer-bottom">
         <p>© 2025 CMAT | Built with ❤️ by AGNES</p>
